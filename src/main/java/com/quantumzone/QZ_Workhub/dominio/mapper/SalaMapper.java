@@ -1,4 +1,4 @@
-package com.quantumzone.QZ_Workhub.dominio.dto.mapper;
+package com.quantumzone.QZ_Workhub.dominio.mapper;
 
 public class SalaMapper {
 }
