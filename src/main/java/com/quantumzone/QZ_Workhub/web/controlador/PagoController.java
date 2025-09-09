@@ -1,6 +1,8 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
 import java.time.LocalDate;
 import java.util.List;
+
+import com.quantumzone.QZ_Workhub.dominio.servicio.PagoService;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Pago;
 //imports de anotacion springboot
 import org.springframework.beans.factory.annotation.Autowired;

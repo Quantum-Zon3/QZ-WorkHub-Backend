@@ -1,5 +1,6 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
 //imports de anotacion springboot
+import com.quantumzone.QZ_Workhub.dominio.servicio.RecursoService;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Recurso;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,9 +33,7 @@ public class RecursoController {
     public RecursoController(RecursoService recursoService) {
         this.recursoService = recursoService;
     }
-    @RestController
-    @RequestMapping("/recursos")
-    public class RecursoController {
+
 
         @GetMapping
         @Operation(summary = "Obtener todos los recursos", description = "Devuelve una lista de todos los recursos registrados.")

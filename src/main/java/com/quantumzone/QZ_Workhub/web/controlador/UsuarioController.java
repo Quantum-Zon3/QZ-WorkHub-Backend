@@ -1,8 +1,10 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
 import java.time.LocalDate;
 import java.util.List;
+
+import com.quantumzone.QZ_Workhub.dominio.servicio.UsuarioService;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Usuario;
-import com.quantumzone.QZ_Workhub.dominio.servicios.
+
 //imports de anotacion springboot
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
