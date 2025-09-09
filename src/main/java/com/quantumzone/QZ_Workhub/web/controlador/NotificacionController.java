@@ -2,6 +2,7 @@ package com.quantumzone.QZ_Workhub.web.controlador;
 import java.time.LocalDate;
 import java.util.List;
 //imports de anotacion springboot
+import com.quantumzone.QZ_Workhub.dominio.servicio.NotificacionService;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Notificacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,9 +33,6 @@ public class NotificacionController {
     public NotificacionController(NotificacionService notificacionService) {
         this.notificacionService = notificacionService;
     }
-    @RestController
-    @RequestMapping("/notificaciones")
-    public class NotificacionController {
 
         @GetMapping
         @Operation(summary = "Obtener todas las notificaciones", description = "Devuelve una lista de todas las notificaciones registradas.")
@@ -112,6 +110,4 @@ public class NotificacionController {
                     .map(notificaciones -> new ResponseEntity<>(notificaciones, HttpStatus.OK))
                     .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
         }
-    }
-
 }
