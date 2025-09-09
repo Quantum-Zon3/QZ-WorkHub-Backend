@@ -1,6 +1,6 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
 //imports de anotacion springboot
-import com.quantumzone.QZ_Workhub.persistencia.Sala;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Sala;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

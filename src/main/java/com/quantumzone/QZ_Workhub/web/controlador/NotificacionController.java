@@ -2,7 +2,7 @@ package com.quantumzone.QZ_Workhub.web.controlador;
 import java.time.LocalDate;
 import java.util.List;
 //imports de anotacion springboot
-import com.quantumzone.QZ_Workhub.persistencia.Notificacion;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Notificacion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

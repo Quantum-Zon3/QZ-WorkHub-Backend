@@ -1,5 +1,5 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
-import com.quantumzone.QZ_Workhub.persistencia.RecursoReservado;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.RecursoReservado;
 //imports de anotacion springboot
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
