@@ -2,9 +2,6 @@ package com.quantumzone.QZ_Workhub.persistencia.repositorio;
 
 import java.util.Optional;
 import java.util.List;
-
-import com.quantumzone.QZ_Workhub.persistencia.Reserva;
-import com.quantumzone.QZ_Workhub.persistencia.Sala;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -18,9 +15,9 @@ public class ReservaRepository {
     private EntityManager entityManager;
 
     //Guardar reserva
-    public Reserva save(Sala sala) {
-        entityManager.persist(sala);
-        return sala;
+    public Reserva save(Reserva reserva) {
+        entityManager.persist(reserva);
+        return reserva;
     }
 
     //Buscar todas las reservas
