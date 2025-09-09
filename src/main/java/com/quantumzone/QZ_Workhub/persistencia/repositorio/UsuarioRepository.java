@@ -2,20 +2,19 @@ package com.quantumzone.QZ_Workhub.persistencia.repositorio;
 
 import java.util.Optional;
 import java.util.List;
-
-import com.quantumzone.QZ_Workhub.persistencia.Usuario;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.*;
-import java.time.LocalDate;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Usuario;
+
 @Repository
 public class UsuarioRepository {
     @PersistenceContext
     private EntityManager entityManager;
-    //Guardar Usuario
+
+    //Guardar usuario
     public Usuario save(Usuario usuario){
         entityManager.persist(usuario);
         return usuario;
@@ -27,7 +26,7 @@ public class UsuarioRepository {
         return query.getResultList();
     }
 
-    //Buscar cliente por id
+    //Buscar usuario por id
     @Transactional
     public Optional<Usuario> findById(Integer id) {
         Query query = entityManager.createNativeQuery("SELECT * FROM usuario WHERE id = :id", Usuario.class);
@@ -40,7 +39,7 @@ public class UsuarioRepository {
         }
     }
 
-    //Eliminar cliente por id
+    //Eliminar usuario por id
     @Transactional
     public boolean deleteById(Integer id) {
         Query query = entityManager.createNativeQuery("DELETE FROM usuario WHERE id = :id");
@@ -49,7 +48,7 @@ public class UsuarioRepository {
         return delete > 0;
     }
 
-    //Actualizar cliente
+    //Actualizar usuario
     public Optional<Usuario>update(Integer id,Usuario usuario) {
         Query query = entityManager.createNativeQuery("UPDATE clientes SET nombre = :nombre, edad = :edad, direccion = :direccion, imagen = :imagen, cedula = :cedula, telefono = :telefono, fechaRegistro = :fechaRegistro, email = :email WHERE id = :id");
         query.setParameter("nombre", usuario.getNombre());
@@ -69,7 +68,7 @@ public class UsuarioRepository {
         }
     }
 
-    //Buscar cliente por filtros
+    //Buscar usuario por filtros
     public Optional<List<Usuario>> findByFilters(String cedula) {
         Query query = entityManager.createNativeQuery("SELECT * FROM usuario WHERE cedula LIKE :cedula", Usuario.class);
         query.setParameter("cedula", cedula );
