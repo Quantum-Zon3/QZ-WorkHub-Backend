@@ -1,4 +1,4 @@
-package com.quantumzone.QZ_Workhub.persistencia;
+package com.quantumzone.QZ_Workhub.persistencia.entidad;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
