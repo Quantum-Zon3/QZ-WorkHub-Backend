@@ -5,17 +5,19 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class PagoRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
     //Guardar pago
-    public Pago save(Pago Pago) {
-        entityManager.persist(Pago);
-        return Pago;
+    public Pago save(Pago pago) {
+        entityManager.persist(pago);
+        return pago;
     }
     //Buscar todos los pagos
     @Transactional
