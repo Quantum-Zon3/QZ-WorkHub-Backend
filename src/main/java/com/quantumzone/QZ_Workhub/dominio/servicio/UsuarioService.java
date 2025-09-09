@@ -1,4 +1,5 @@
-import com.quantumzone.QZ_Workhub.persistencia.Usuario;
+package com.quantumzone.QZ_Workhub.dominio.servicio;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Usuario;
 import com.quantumzone.QZ_Workhub.persistencia.repositorio.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
