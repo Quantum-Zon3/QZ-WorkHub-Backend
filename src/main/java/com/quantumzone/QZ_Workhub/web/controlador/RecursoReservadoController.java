@@ -25,11 +25,12 @@ import java.util.List;
 @RequestMapping("/qzwork_hub/recursosReservados")
 @Tag(name = "RecursoReservado", description = "Controlador de recursosReservados")
 public class RecursoReservadoController {
-    private final RecursoReservadoService recursoRecursoReservadoService;
+
+    private final RecursoReservadoService recursoReservadoService;
 
     @Autowired
-    public RecursoReservadoController(RecursoReservadoService recursoRecursoReservadoService) {
-        this.recursoRecursoReservadoService = recursoRecursoReservadoService;
+    public RecursoReservadoController(RecursoReservadoService recursoReservadoService) {
+        this.recursoReservadoService = recursoReservadoService;
     }
 
         @GetMapping
