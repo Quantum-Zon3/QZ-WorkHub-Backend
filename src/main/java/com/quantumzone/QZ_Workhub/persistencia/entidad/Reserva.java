@@ -3,7 +3,12 @@ package com.quantumzone.QZ_Workhub.persistencia.entidad;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
-
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "reserva")
 public class Reserva {
@@ -45,108 +50,5 @@ public class Reserva {
 
     @OneToMany(mappedBy = "reserva")
     private List<RecursoReservado> recursosReservados;
-
-    // Constructor vacío (obligatorio para JPA)
-    public Reserva() {}
-
-    // Constructor con parámetros
-    public Reserva(LocalDateTime fechaInicio, LocalDateTime fechaFin, String montoTotal,
-                   Integer cantidadVisitantes, Usuario usuario, Sala sala) {
-        this.fechaInicio = fechaInicio;
-        this.fechaFin = fechaFin;
-        this.montoTotal = montoTotal;
-        this.cantidadVisitantes = cantidadVisitantes;
-        this.usuario = usuario;
-        this.sala = sala;
-    }
-
-    // Getters y Setters
-    public Integer getIdReserva() {
-        return idReserva;
-    }
-
-    public void setIdReserva(Integer idReserva) {
-        this.idReserva = idReserva;
-    }
-
-    public LocalDateTime getFechaInicio() {
-        return fechaInicio;
-    }
-
-    public void setFechaInicio(LocalDateTime fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
-
-    public LocalDateTime getFechaFin() {
-        return fechaFin;
-    }
-
-    public void setFechaFin(LocalDateTime fechaFin) {
-        this.fechaFin = fechaFin;
-    }
-
-    public String getMontoTotal() {
-        return montoTotal;
-    }
-
-    public void setMontoTotal(String montoTotal) {
-        this.montoTotal = montoTotal;
-    }
-
-    public Integer getCantidadVisitantes() {
-        return cantidadVisitantes;
-    }
-
-    public void setCantidadVisitantes(Integer cantidadVisitantes) {
-        this.cantidadVisitantes = cantidadVisitantes;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-
-    public Sala getSala() {
-        return sala;
-    }
-
-    public void setSala(Sala sala) {
-        this.sala = sala;
-    }
-
-    public List<Pago> getPagos() {
-        return pagos;
-    }
-
-    public void setPagos(List<Pago> pagos) {
-        this.pagos = pagos;
-    }
-
-    public List<Notificacion> getNotificaciones() {
-        return notificaciones;
-    }
-
-    public void setNotificaciones(List<Notificacion> notificaciones) {
-        this.notificaciones = notificaciones;
-    }
-
-    public List<Reporte> getReportes() {
-        return reportes;
-    }
-
-    public void setReportes(List<Reporte> reportes) {
-        this.reportes = reportes;
-    }
-
-    public List<RecursoReservado> getRecursosReservados() {
-        return recursosReservados;
-    }
-
-    public void setRecursosReservados(List<RecursoReservado> recursosReservados) {
-        this.recursosReservados = recursosReservados;
-    }
 
 }
