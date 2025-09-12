@@ -1,4 +1,5 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
+import com.quantumzone.QZ_Workhub.dominio.enums.Rol;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Usuario;
 import com.quantumzone.QZ_Workhub.persistencia.repositorio.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class UsuarioService {
     }
 
     // Encontrar un usuario por id
-    public Optional<Usuario> findById(Integer id) {
+    public Optional<Usuario> findById(Long id) {
         return usuarioRepository.findById(id);
     }
 
@@ -38,17 +39,16 @@ public class UsuarioService {
     }
 
     // Eliminar un usuario por id
-    public boolean deleteById(Integer id) {
-        return usuarioRepository.deleteById(id);
+    public void deleteById(Long id) {usuarioRepository.deleteById(id);
     }
 
     // Actualizar un usuario
-    public Optional<Usuario> update(Integer id, Usuario usuario) {
-        return usuarioRepository.update(id, usuario);
+    public Usuario update(Usuario usuario) {
+        return usuarioRepository.save(usuario);
     }
 
     // Buscar usuario por filtros
-    public Optional<List<Usuario>> findByFilters(String cedula) {
-        return usuarioRepository.findByFilters(cedula);
+    public Optional<List<Usuario>> findByFilters(Rol rol) {
+        return usuarioRepository.findUsuarioByRol(rol);
     }
 }

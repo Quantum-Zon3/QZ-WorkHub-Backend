@@ -28,7 +28,7 @@ public class ReservaService {
     }
 
     // Encontrar una reserva por id
-    public Optional<Reserva> findById(Integer id) {
+    public Optional<Reserva> findById(Long id) {
         return reservaRepository.findById(id);
     }
 
@@ -38,18 +38,17 @@ public class ReservaService {
     }
 
     // Eliminar una reserva por id
-    public boolean deleteById(Integer id) {
-        return reservaRepository.deleteById(id);
+    public void deleteById(Long id) {reservaRepository.deleteById(id);
     }
 
     // Actualizar una reserva
-    public Optional<Reserva> update(Integer id, Reserva reserva) {
-        return reservaRepository.update(id, reserva);
+    public Reserva update(Reserva reserva) {
+        return reservaRepository.save(reserva);
     }
 
-    // Buscar reservas por filtros (ejemplo: usuario, fecha o estado)
-    public Optional<List<Reserva>> findByFilters(String filtro) {
-        return reservaRepository.findByFilters(filtro);
+    // Buscar reservas por filtros )
+    public Optional<List<Reserva>> findByCantidadVisitantesAsc(Integer filtro) {
+        return reservaRepository.findByCantidadVisitantesAsc(filtro);
     }
 }
 

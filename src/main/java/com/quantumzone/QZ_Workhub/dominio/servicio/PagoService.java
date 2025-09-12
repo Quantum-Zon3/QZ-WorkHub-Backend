@@ -1,5 +1,6 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Pago;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Reserva;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.quantumzone.QZ_Workhub.persistencia.repositorio.PagoRepository;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ public class PagoService {
     }
 
     // Encontrar un pago por id
-    public Optional<Pago> findById(Integer id) {
+    public Optional<Pago> findById(Long id) {
         return pagoRepository.findById(id);
     }
 
@@ -39,17 +40,20 @@ public class PagoService {
     }
 
     // Eliminar un pago por id
-    public boolean deleteById(Integer id) {
-        return pagoRepository.deleteById(id);
+    public void deleteById(Long id) {
+         pagoRepository.deleteById(id);
     }
 
     // Actualizar un pago
-    public Optional<Pago> update(Integer id, Pago pago) {
-        return pagoRepository.update(id, pago);
+    public Pago update(Pago pago) {
+        return pagoRepository.save(pago);
     }
 
-    // Buscar pagos por filtros (ejemplo: por referencia o estado)
-    public Optional<List<Pago>> findByFilters(String referencia) {
-        return pagoRepository.findByFilters(referencia);
+    // Buscar pagos por filtros
+    public Optional<List<Pago>> findByReserva(Reserva reserva) {
+        return pagoRepository.findByReserva(reserva);
+    }
+    public Optional<List<Pago>> findByReservaUsuarioCedula(Long cedula) {
+        return pagoRepository.findByReservaUsuarioCedula(cedula);
     }
 }

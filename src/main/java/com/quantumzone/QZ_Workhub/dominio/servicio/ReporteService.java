@@ -1,8 +1,10 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Reporte;
+import com.quantumzone.QZ_Workhub.persistencia.repositorio.ReporteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.quantumzone.QZ_Workhub.persistencia.repositorio.Reporte;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +30,7 @@ public class ReporteService {
     }
 
     // Encontrar un reporte por id
-    public Optional<Reporte> findById(Integer id) {
+    public Optional<Reporte> findById(Long id) {
         return reporteRepository.findById(id);
     }
 
@@ -38,17 +40,17 @@ public class ReporteService {
     }
 
     // Eliminar un reporte por id
-    public boolean deleteById(Integer id) {
-        return reporteRepository.deleteById(id);
+    public void deleteById(Long id) {
+        reporteRepository.deleteById(id);
     }
 
     // Actualizar un reporte
-    public Optional<Reporte> update(Integer id, Reporte reporte) {
-        return reporteRepository.update(id, reporte);
+    public Reporte update(Reporte reporte) {
+        return reporteRepository.save(reporte);
     }
 
-    // Buscar reportes por filtros (ejemplo: tipo, estado o fecha)
-    public Optional<List<Reporte>> findByFilters(String filtro) {
-        return reporteRepository.findByFilters(filtro);
+    // Buscar reportes por filtros
+    public Optional<List<Reporte>> findByFecha(LocalDateTime time) {
+        return reporteRepository.findByFecha(time);
     }
 }

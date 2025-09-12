@@ -29,7 +29,7 @@ public class RecursoReservadoService {
     }
 
     // Encontrar un recurso reservado por id
-    public Optional<RecursoReservado> findById(Integer id) {
+    public Optional<RecursoReservado> findById(Long id) {
         return recursoReservadoRepository.findById(id);
     }
 
@@ -39,18 +39,18 @@ public class RecursoReservadoService {
     }
 
     // Eliminar un recurso reservado por id
-    public boolean deleteById(Integer id) {
-        return recursoReservadoRepository.deleteById(id);
+    public void deleteById(Long id) {recursoReservadoRepository.deleteById(id);
     }
 
     // Actualizar un recurso reservado
-    public Optional<RecursoReservado> update(Integer id, RecursoReservado recursoReservado) {
-        return recursoReservadoRepository.update(id, recursoReservado);
+    public RecursoReservado update(RecursoReservado recursoReservado) {
+        return recursoReservadoRepository.save(recursoReservado);
     }
-
+    /*
     // Buscar recursos reservados por filtros (ejemplo: idUsuario o fecha)
     public Optional<List<RecursoReservado>> findByFilters(String filtro) {
         return recursoReservadoRepository.findByFilters(filtro);
     }
+     */
 }
 
