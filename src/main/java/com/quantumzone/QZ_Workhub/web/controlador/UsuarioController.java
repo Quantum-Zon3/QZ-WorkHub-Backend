@@ -2,6 +2,7 @@ package com.quantumzone.QZ_Workhub.web.controlador;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.quantumzone.QZ_Workhub.dominio.enums.Rol;
 import com.quantumzone.QZ_Workhub.dominio.servicio.UsuarioService;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Usuario;
 
@@ -26,7 +27,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/qzwork_hub/usuarios")
-@Tag(name = "Usuario", description = "Controlador de usurios")
+@Tag(name = "Usuario", description = "Controlador de usuarios")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -35,6 +36,7 @@ public class UsuarioController {
     public UsuarioController(UsuarioService usuarioService ) {
         this.usuarioService = usuarioService;
     }
+
     @GetMapping
     @Operation(summary = "Obtener todos los usuarios", description = "Devuelve una lista de todos los usuarios registrados.")
     @ApiResponses(value = {
@@ -51,7 +53,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
-    public ResponseEntity<Usuario> getUsuarioById(@PathVariable @Parameter(description = "ID del usuario") int id) {
+    public ResponseEntity<Usuario> getUsuarioById(@PathVariable @Parameter(description = "ID del usuario") Long id) {
         return usuarioService.findById(id)
                 .map(usuario -> new ResponseEntity<>(usuario, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -63,23 +65,22 @@ public class UsuarioController {
             @ApiResponse(responseCode = "201", description = "Usuario creado con éxito"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
-    public ResponseEntity<Usuario> createUsuario(@RequestBody @Parameter(description = "Datos del usuario a crear") Usuario usuario) {
+    public ResponseEntity<Usuario> createUsuario(
+            @RequestBody @Parameter(description = "Datos del usuario a crear") Usuario usuario) {
         Usuario nuevoUsuario = usuarioService.save(usuario);
         return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping
     @Operation(summary = "Actualizar un usuario", description = "Actualiza los datos de un usuario existente.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Usuario actualizado con éxito"),
-            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+            @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
     public ResponseEntity<Usuario> updateUsuario(
-            @PathVariable @Parameter(description = "ID del usuario") int id,
             @RequestBody @Parameter(description = "Datos actualizados del usuario") Usuario usuario) {
-        return usuarioService.update(id, usuario)
-                .map(updatedUsuario -> new ResponseEntity<>(updatedUsuario, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        Usuario updatedUsuario = usuarioService.update(usuario);
+        return new ResponseEntity<>(updatedUsuario, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -88,29 +89,26 @@ public class UsuarioController {
             @ApiResponse(responseCode = "204", description = "Usuario eliminado con éxito"),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
-    public ResponseEntity<Void> deleteUsuario(@PathVariable @Parameter(description = "ID del usuario") int id) {
-        boolean usuarioEliminado = usuarioService.deleteById(id);
-        return usuarioEliminado
-                ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Void> deleteUsuario(
+            @PathVariable @Parameter(description = "ID del usuario") Long id) {
+        if (usuarioService.findById(id).isPresent()) {
+            usuarioService.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @GetMapping("/buscar")
-    @Operation(summary = "Buscar usuarios por filtros", description = "Busca usuarios por nombre, email, edad, etc.")
+    @GetMapping("/rol")
+    @Operation(summary = "Buscar usuarios por rol", description = "Devuelve los usuarios asociados a un rol específico.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Usuarios encontrados"),
-            @ApiResponse(responseCode = "400", description = "Parámetros inválidos")
+            @ApiResponse(responseCode = "404", description = "No se encontraron usuarios con ese rol")
     })
-    public ResponseEntity<List<Usuario>> buscarUsuarios(
-            @RequestParam(required = false) @Parameter(description = "Nombre del usuario") String nombre,
-            @RequestParam(required = false) @Parameter(description = "Cédula del usuario") String cedula,
-            @RequestParam(required = false) @Parameter(description = "Teléfono del usuario") String telefono,
-            @RequestParam(required = false) @Parameter(description = "Fecha de registro del usuario") LocalDate fechaRegistro,
-            @RequestParam(required = false) @Parameter(description = "Email del usuario") String email) {
+    public ResponseEntity<List<Usuario>> buscarUsuariosPorRol(
+            @RequestParam @Parameter(description = "Rol del usuario") Rol rol) {
 
-        return usuarioService.findByFilters(nombre,cedula, telefono, fechaRegistro, email)
+        return usuarioService.findUsuarioByRol(rol)
                 .map(usuarios -> new ResponseEntity<>(usuarios, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
 }

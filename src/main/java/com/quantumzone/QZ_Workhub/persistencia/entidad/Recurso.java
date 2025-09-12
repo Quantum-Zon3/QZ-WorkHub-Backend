@@ -34,7 +34,7 @@ public class Recurso {
     @Column(name = "precio", nullable = false)
     private Float precio;
 
-    // Relaciones
+
     @OneToMany(mappedBy = "recurso")
     private List<RecursoReservado> recursoReservados;
 
