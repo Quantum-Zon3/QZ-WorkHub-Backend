@@ -13,5 +13,5 @@ public interface RecursoRepository extends  JpaRepository<Recurso, Long> {
     /**
      * Buscar recurso por tipo (tecnologico ó mueble)
      */
-    List<Recurso> findRecursosByTipo(TipoRecurso tipo);
+    Optional<List<Recurso>> findRecursosByTipo(TipoRecurso tipo);
 }
