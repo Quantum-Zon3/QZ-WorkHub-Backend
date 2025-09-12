@@ -1,5 +1,6 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Notificacion;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Reserva;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.quantumzone.QZ_Workhub.persistencia.repositorio.NotificacionRepository;
@@ -17,18 +18,16 @@ public class NotificacionService {
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
-
     private void initSampleData() {
-        // Aquí podrías cargar datos iniciales de prueba si deseas
-    }
 
+    }
     // Guardar una notificación
     public Notificacion save(Notificacion notificacion) {
         return notificacionRepository.save(notificacion);
     }
 
     // Encontrar una notificación por id
-    public Optional<Notificacion> findById(Integer id) {
+    public Optional<Notificacion> findById(Long id) {
         return notificacionRepository.findById(id);
     }
 
@@ -38,17 +37,20 @@ public class NotificacionService {
     }
 
     // Eliminar una notificación por id
-    public boolean deleteById(Integer id) {
-        return notificacionRepository.deleteById(id);
+    public void deleteById(Long id) { notificacionRepository.deleteById(id);
     }
 
     // Actualizar una notificación
-    public Optional<Notificacion> update(Integer id, Notificacion notificacion) {
-        return notificacionRepository.update(id, notificacion);
+    public Notificacion update(Notificacion notificacion) {
+        return notificacionRepository.save(notificacion);
     }
 
     // Buscar notificaciones por filtros
-    public Optional<List<Notificacion>> findByFilters(String tipo) {
-        return notificacionRepository.findByFilters(tipo);
+    public Optional<List<Notificacion>> findByReserva(Reserva reserva) {
+        return notificacionRepository.findByReserva(reserva);
     }
+    public Optional<List<Notificacion>> findByReserva(Long cedula) {
+        return notificacionRepository.findByReservaUsuarioCedula(cedula);
+    }
+
 }

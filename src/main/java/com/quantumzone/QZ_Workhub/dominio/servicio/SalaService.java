@@ -28,7 +28,7 @@ public class SalaService {
     }
 
     // Encontrar una sala por id
-    public Optional<Sala> findById(Integer id) {
+    public Optional<Sala> findById(Long id) {
         return salaRepository.findById(id);
     }
 
@@ -38,17 +38,17 @@ public class SalaService {
     }
 
     // Eliminar una sala por id
-    public boolean deleteById(Integer id) {
-        return salaRepository.deleteById(id);
+    public void deleteById(Long id) {
+        salaRepository.deleteById(id);
     }
 
     // Actualizar una sala
-    public Optional<Sala> update(Integer id, Sala sala) {
-        return salaRepository.update(id, sala);
+    public Sala update(Sala sala) {
+        return salaRepository.save(sala);
     }
 
-    // Buscar salas por filtros (ejemplo: nombre, capacidad o disponibilidad)
-    public Optional<List<Sala>> findByFilters(String filtro) {
-        return salaRepository.findByFilters(filtro);
+    // Buscar salas por filtros
+    public Optional<List<Sala>> findByFilters(String nombre) {
+        return salaRepository.findByNombre(nombre);
     }
 }

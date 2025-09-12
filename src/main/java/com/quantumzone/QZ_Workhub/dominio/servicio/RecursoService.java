@@ -1,5 +1,5 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
-
+import com.quantumzone.QZ_Workhub.dominio.enums.TipoRecurso;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Recurso;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class RecursoService {
     }
 
     // Encontrar un recurso por id
-    public Optional<Recurso> findById(Integer id) {
+    public Optional<Recurso> findById(Long id) {
         return recursoRepository.findById(id);
     }
 
@@ -39,18 +39,17 @@ public class RecursoService {
     }
 
     // Eliminar un recurso por id
-    public boolean deleteById(Integer id) {
-        return recursoRepository.deleteById(id);
+    public void deleteById(Long id) {recursoRepository.deleteById(id);
     }
 
     // Actualizar un recurso
-    public Optional<Recurso> update(Integer id, Recurso recurso) {
-        return recursoRepository.update(id, recurso);
+    public Recurso update(Recurso recurso) {
+        return recursoRepository.save(recurso);
     }
 
-    // Buscar recursos por filtros (ejemplo: tipo o disponibilidad)
-    public Optional<List<Recurso>> findByFilters(String tipo) {
-        return recursoRepository.findByFilters(tipo);
+    // Buscar recursos por filtros
+    public Optional<List<Recurso>> findByTipo(TipoRecurso tipo) {
+        return recursoRepository.findRecursosByTipo(tipo);
     }
 }
 
