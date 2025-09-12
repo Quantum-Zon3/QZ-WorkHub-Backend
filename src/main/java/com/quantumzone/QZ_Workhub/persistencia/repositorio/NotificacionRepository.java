@@ -2,7 +2,6 @@ package com.quantumzone.QZ_Workhub.persistencia.repositorio;
 
 import java.util.Optional;
 import java.util.List;
-
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Reserva;
 import jakarta.persistence.EntityManager;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Notificacion;
@@ -14,19 +13,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface NotificacionRepository extends JpaRepository<Notificacion, Long> {
-
     /**
     * Buscar notifiacion por reserva
     */
-    List<Notificacion> findByReserva(Reserva reserva);
-
-    /**
-     * Buscar notificacion por id
-     */
-    List<Notificacion> findByIdNotificacion(Long idNotificacion);
-
+    Optional<List<Notificacion>> findByReserva(Reserva reserva);
     /**
      * Buscar notificacion del Mienbro
      */
-    List<Notificacion> findByReservaUsuarioCedula(Long cedula);
+    Optional<List<Notificacion>> findByReservaUsuarioCedula(Long cedula);
 }

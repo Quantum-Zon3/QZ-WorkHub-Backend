@@ -13,20 +13,13 @@ import java.util.Optional;
 
 @Repository
 public interface PagoRepository extends JpaRepository<Pago,Long>  {
-
     /**
      * Buscar pago por Reserva
      */
-    List<Pago> findByReserva(Reserva reserva);
-
-    /**
-     * Buscar pago por id
-     */
-    Pago findPagoByIdPago(Long idPago);
-
+    Optional<List<Pago>> findByReserva(Reserva reserva);
     /**
      * Buscar pago del Mienbro
      */
-    List<Pago> findByReservaUsuarioCedula(Long cedula);
+    Optional<List<Pago>> findByReservaUsuarioCedula(Long cedula);
 
 }
