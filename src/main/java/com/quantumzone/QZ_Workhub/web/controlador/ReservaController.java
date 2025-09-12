@@ -26,6 +26,7 @@ import java.util.List;@RestController
 @RequestMapping("/qzwork_hub/reservas")
 @Tag(name = "Reserva", description = "Controlador de reservas")
 public class ReservaController {
+
     private final ReservaService reservaService;
 
     @Autowired
@@ -50,7 +51,7 @@ public class ReservaController {
             @ApiResponse(responseCode = "404", description = "Reserva no encontrada")
     })
     public ResponseEntity<Reserva> getReservaById(
-            @PathVariable @Parameter(description = "ID de la reserva") int id) {
+            @PathVariable @Parameter(description = "ID de la reserva") Long id) {
         return reservaService.findById(id)
                 .map(reserva -> new ResponseEntity<>(reserva, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -68,18 +69,16 @@ public class ReservaController {
         return new ResponseEntity<>(nuevaReserva, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping
     @Operation(summary = "Actualizar una reserva", description = "Actualiza los datos de una reserva existente.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Reserva actualizada con éxito"),
-            @ApiResponse(responseCode = "404", description = "Reserva no encontrada")
+            @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
     public ResponseEntity<Reserva> updateReserva(
-            @PathVariable @Parameter(description = "ID de la reserva") int id,
             @RequestBody @Parameter(description = "Datos actualizados de la reserva") Reserva reserva) {
-        return reservaService.update(id, reserva)
-                .map(updatedReserva -> new ResponseEntity<>(updatedReserva, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        Reserva updatedReserva = reservaService.update(reserva);
+        return new ResponseEntity<>(updatedReserva, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -89,29 +88,23 @@ public class ReservaController {
             @ApiResponse(responseCode = "404", description = "Reserva no encontrada")
     })
     public ResponseEntity<Void> deleteReserva(
-            @PathVariable @Parameter(description = "ID de la reserva") int id) {
-        boolean eliminada = reservaService.deleteById(id);
-        return eliminada
-                ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            @PathVariable @Parameter(description = "ID de la reserva") Long id) {
+        reservaService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/buscar")
-    @Operation(summary = "Buscar reservas por filtros", description = "Busca reservas por usuario, recurso, estado o fecha.")
+    @Operation(summary = "Buscar reservas por cantidad de visitantes", description = "Busca reservas con cantidad de visitantes mayor o igual a un valor.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Reservas encontradas"),
-            @ApiResponse(responseCode = "400", description = "Parámetros inválidos")
+            @ApiResponse(responseCode = "404", description = "No se encontraron reservas")
     })
     public ResponseEntity<List<Reserva>> buscarReservas(
-            @RequestParam(required = false) @Parameter(description = "ID del usuario asociado") Integer usuarioId,
-            @RequestParam(required = false) @Parameter(description = "ID del recurso asociado") Integer recursoId,
-            @RequestParam(required = false) @Parameter(description = "Estado de la reserva") String estado,
-            @RequestParam(required = false) @Parameter(description = "Fecha de la reserva") LocalDate fecha) {
+            @RequestParam(required = true) @Parameter(description = "Cantidad mínima de visitantes") Integer filtro) {
 
-        return reservaService.findByFilters(usuarioId, recursoId, estado, fecha)
+        return reservaService.findByCantidadVisitantesAsc(filtro)
                 .map(reservas -> new ResponseEntity<>(reservas, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
-
 }
+
