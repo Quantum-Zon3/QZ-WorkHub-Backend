@@ -48,7 +48,7 @@ public class SalaService {
     }
 
     // Buscar salas por filtros
-    public Optional<List<Sala>> findByFilters(String nombre) {
+    public Optional<List<Sala>> findByNombre(String nombre) {
         return salaRepository.findByNombre(nombre);
     }
 }

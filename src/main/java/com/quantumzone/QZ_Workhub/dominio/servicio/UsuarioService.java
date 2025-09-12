@@ -48,7 +48,7 @@ public class UsuarioService {
     }
 
     // Buscar usuario por filtros
-    public Optional<List<Usuario>> findByFilters(Rol rol) {
+    public Optional<List<Usuario>> findUsuarioByRol(Rol rol) {
         return usuarioRepository.findUsuarioByRol(rol);
     }
 }
