@@ -47,8 +47,8 @@ public class ReservaService {
     }
 
     // Buscar reservas por filtros )
-    public Optional<List<Reserva>> findByCantidadVisitantesAsc(Integer filtro) {
-        return reservaRepository.findByCantidadVisitantesAsc(filtro);
+    public Optional<List<Reserva>> findByCantidadVisitantes(Integer filtro) {
+        return reservaRepository.findByCantidadVisitantes(filtro);
     }
 }
 
