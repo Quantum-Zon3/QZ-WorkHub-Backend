@@ -1,75 +1,32 @@
 package com.quantumzone.QZ_Workhub.persistencia.repositorio;
 
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Notificacion;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Pago;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
-import jakarta.transaction.Transactional;
+//imports de conexion base de datos
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Reserva;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class PagoRepository {
-    @PersistenceContext
-    private EntityManager entityManager;
+public interface PagoRepository extends JpaRepository<Pago,Long>  {
 
-    //Guardar pago
-    public Pago save(Pago pago) {
-        entityManager.persist(pago);
-        return pago;
-    }
-    //Buscar todos los pagos
-    @Transactional
-    public List<Pago> findAll() {
-        Query query = entityManager.createNativeQuery("SELECT * FROM pago ", Pago.class);
-        return query.getResultList();
-    }
+    /**
+     * Buscar pago por Reserva
+     */
+    List<Pago> findByReserva(Reserva reserva);
 
-    //Buscar pago por id
-    @Transactional
-    public Optional<Pago> findById(Integer id) {
-        Query query = entityManager.createNativeQuery("SELECT * FROM pago WHERE id = :id", Pago.class);
-        query.setParameter("id", id);
-        try {
-            Pago pago = (Pago) query.getSingleResult();
-            return Optional.of(pago);
-        } catch (Exception e) {
-            return Optional.empty();
-        }
-    }
+    /**
+     * Buscar pago por id
+     */
+    Pago findPagoByIdPago(Long idPago);
 
-    //Eliminar pago por id
-    @Transactional
-    public boolean deleteById(Integer id) {
-        Query query = entityManager.createNativeQuery("DELETE FROM pago WHERE id = :id");
-        query.setParameter("id", id);
-        int delete = query.executeUpdate();
-        return delete > 0;
-    }
+    /**
+     * Buscar pago del Mienbro
+     */
+    List<Pago> findByReservaUsuarioCedula(Long cedula);
 
-    //Actualizar pago
-    public Optional<Pago>update(Integer id ,Pago pago) {
-        Query query = entityManager.createNativeQuery("UPDATE pago SET nombre = :nombre WHERE id = :id");
-        query.setParameter("id", pago.getNombre());
-        query.setParameter("id", pago.getId());
-        int update = query.executeUpdate();
-        if (update > 0) {
-            return findById(id);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    //Buscar pago por filtros
-    public Optional<List<Pago>> findByFilters(String cedula) {
-        Query query = entityManager.createNativeQuery("SELECT * FROM pago WHERE cedula LIKE :cedula", Pago.class);
-        query.setParameter("cedula", cedula );
-        try {
-            List<Pago> pago = query.getResultList();
-            return Optional.of(pago);
-        } catch (Exception e) {
-            return Optional.empty();
-        }
-    }
 }
