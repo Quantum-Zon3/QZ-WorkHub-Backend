@@ -14,6 +14,12 @@ public class RecursoReservado {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // id auto generada
     private Long id;
-    //atributos por definir
+
+    @ManyToOne
+    @JoinColumn(name = "id_recurso", nullable = false)
+    private Recurso recurso;
+    @ManyToOne
+    @JoinColumn(name = "id_reserva", nullable = false)
+    private Reserva reserva;
 
 }
