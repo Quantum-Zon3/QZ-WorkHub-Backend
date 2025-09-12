@@ -1,11 +1,13 @@
 package com.quantumzone.QZ_Workhub.persistencia.entidad;
 // imports de la persitencia
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "recurso_reservado")
 public class RecursoReservado {
@@ -13,6 +15,5 @@ public class RecursoReservado {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // id auto generada
     private Long id;
     //atributos por definir
-    public RecursoReservado() {
-    }
+
 }

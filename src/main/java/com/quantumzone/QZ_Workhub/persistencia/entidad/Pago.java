@@ -1,10 +1,15 @@
 package com.quantumzone.QZ_Workhub.persistencia.entidad;
+import java.time.LocalDateTime;
 // imports de la persitencia
 import com.quantumzone.QZ_Workhub.dominio.enums.EstadoPago;
 import com.quantumzone.QZ_Workhub.dominio.enums.MetodoPago;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "pago")
 public class Pago {
@@ -31,6 +36,7 @@ public class Pago {
     @JoinColumn(name = "id_reserva", nullable = false)
     private Reserva reserva;
 
+    /*
     // Constructor vacío
     public Pago() {}
 
@@ -91,5 +97,5 @@ public class Pago {
     public void setReserva(Reserva reserva) {
         this.reserva = reserva;
     }
-
+    */
 }
