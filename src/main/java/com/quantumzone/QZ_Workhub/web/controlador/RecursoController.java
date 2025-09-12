@@ -1,8 +1,11 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
 //imports de anotacion springboot
+import com.quantumzone.QZ_Workhub.dominio.enums.TipoRecurso;
 import com.quantumzone.QZ_Workhub.dominio.servicio.RecursoService;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Recurso;
+import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,7 +54,7 @@ public class RecursoController {
                 @ApiResponse(responseCode = "200", description = "Recurso encontrado"),
                 @ApiResponse(responseCode = "404", description = "Recurso no encontrado")
         })
-        public ResponseEntity<Recurso> getRecursoById(@PathVariable @Parameter(description = "ID del recurso") int id) {
+        public ResponseEntity<Recurso> getRecursoById(@PathVariable @Parameter(description = "ID del recurso") Long id) {
             return recursoService.findById(id)
                     .map(recurso -> new ResponseEntity<>(recurso, HttpStatus.OK))
                     .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -75,11 +78,11 @@ public class RecursoController {
                 @ApiResponse(responseCode = "404", description = "Recurso no encontrado")
         })
         public ResponseEntity<Recurso> updateRecurso(
-                @PathVariable @Parameter(description = "ID del recurso") int id,
+                @PathVariable @Parameter(description = "ID del recurso") Long id,
                 @RequestBody @Parameter(description = "Datos actualizados del recurso") Recurso recurso) {
-            return recursoService.update(id, recurso)
-                    .map(updatedRecurso -> new ResponseEntity<>(updatedRecurso, HttpStatus.OK))
-                    .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+            Recurso recursoActualizado = recursoService.update(recurso);
+            return new ResponseEntity<>(recursoActualizado, HttpStatus.OK);
+
         }
 
         @DeleteMapping("/{id}")
@@ -88,11 +91,13 @@ public class RecursoController {
                 @ApiResponse(responseCode = "204", description = "Recurso eliminado con éxito"),
                 @ApiResponse(responseCode = "404", description = "Recurso no encontrado")
         })
-        public ResponseEntity<Void> deleteRecurso(@PathVariable @Parameter(description = "ID del recurso") int id) {
-            boolean recursoEliminado = recursoService.deleteById(id);
-            return recursoEliminado
-                    ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        public ResponseEntity<Void> deleteRecurso(@PathVariable @Parameter(description = "ID del recurso") Long id) {
+            try {
+                recursoService.deleteById(id);
+                return ResponseEntity.noContent().build();
+            } catch (EmptyResultDataAccessException e) {
+                return ResponseEntity.notFound().build();
+            }
         }
 
         @GetMapping("/buscar")
@@ -101,13 +106,10 @@ public class RecursoController {
                 @ApiResponse(responseCode = "200", description = "Recursos encontrados"),
                 @ApiResponse(responseCode = "400", description = "Parámetros inválidos")
         })
-        public ResponseEntity<List<Recurso>> buscarRecursos(
-                @RequestParam(required = false) @Parameter(description = "Nombre del recurso") String nombre,
-                @RequestParam(required = false) @Parameter(description = "Tipo de recurso") String tipo,
-                @RequestParam(required = false) @Parameter(description = "Estado del recurso") String estado)
+        public ResponseEntity<List<Recurso>> buscarRecursosPorTipo(
+                @RequestParam(required = false) @Parameter(description = "Tipo de recurso") TipoRecurso tipo)
                  {
-
-            return recursoService.findByFilters(nombre, tipo, estado)
+            return recursoService.findByTipo(tipo)
                     .map(recursos -> new ResponseEntity<>(recursos, HttpStatus.OK))
                     .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
         }

@@ -4,7 +4,10 @@ import java.util.List;
 //imports de anotacion springboot
 import com.quantumzone.QZ_Workhub.dominio.servicio.NotificacionService;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Notificacion;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Reserva;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Sala;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,7 +53,7 @@ public class NotificacionController {
                 @ApiResponse(responseCode = "200", description = "Notificación encontrada"),
                 @ApiResponse(responseCode = "404", description = "Notificación no encontrada")
         })
-        public ResponseEntity<Notificacion> getNotificacionById(@PathVariable @Parameter(description = "ID de la notificación") int id) {
+        public ResponseEntity<Notificacion> getNotificacionById(@PathVariable @Parameter(description = "ID de la notificación") Long id) {
             return notificacionService.findById(id)
                     .map(notificacion -> new ResponseEntity<>(notificacion, HttpStatus.OK))
                     .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -74,11 +77,10 @@ public class NotificacionController {
                 @ApiResponse(responseCode = "404", description = "Notificación no encontrada")
         })
         public ResponseEntity<Notificacion> updateNotificacion(
-                @PathVariable @Parameter(description = "ID de la notificación") int id,
+                @PathVariable @Parameter(description = "ID de la notificación") Long id,
                 @RequestBody @Parameter(description = "Datos actualizados de la notificación") Notificacion notificacion) {
-            return notificacionService.update(id, notificacion)
-                    .map(updatedNotificacion -> new ResponseEntity<>(updatedNotificacion, HttpStatus.OK))
-                    .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+            Notificacion notiActualizada = notificacionService.update(notificacion);
+            return new ResponseEntity<>(notiActualizada, HttpStatus.OK);
         }
 
         @DeleteMapping("/{id}")
@@ -87,11 +89,13 @@ public class NotificacionController {
                 @ApiResponse(responseCode = "204", description = "Notificación eliminada con éxito"),
                 @ApiResponse(responseCode = "404", description = "Notificación no encontrada")
         })
-        public ResponseEntity<Void> deleteNotificacion(@PathVariable @Parameter(description = "ID de la notificación") int id) {
-            boolean notificacionEliminada = notificacionService.deleteById(id);
-            return notificacionEliminada
-                    ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                    : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        public ResponseEntity<Void> deleteNotificacion(@PathVariable Long id) {
+            try {
+                notificacionService.deleteById(id);
+                return ResponseEntity.noContent().build();
+            } catch (EmptyResultDataAccessException e) {
+                return ResponseEntity.notFound().build();
+            }
         }
 
         @GetMapping("/buscar")
@@ -101,13 +105,16 @@ public class NotificacionController {
                 @ApiResponse(responseCode = "400", description = "Parámetros inválidos")
         })
         public ResponseEntity<List<Notificacion>> buscarNotificaciones(
-                @RequestParam(required = false) @Parameter(description = "Título de la notificación") String titulo,
-                @RequestParam(required = false) @Parameter(description = "Mensaje de la notificación") String mensaje,
-                @RequestParam(required = false) @Parameter(description = "Fecha de la notificación") LocalDate fecha,
-                @RequestParam(required = false) @Parameter(description = "ID del usuario asociado") Integer usuarioId) {
-
-            return notificacionService.findByFilters(titulo, mensaje, fecha, usuarioId)
+                @RequestParam(required = false) @Parameter(description = "Reserva completa") Reserva reserva,
+                @RequestParam(required = false) @Parameter(description = "La cedula del usuario") Long cedula) {
+        if(reserva!=null) {
+            return notificacionService.findByReserva(reserva)
                     .map(notificaciones -> new ResponseEntity<>(notificaciones, HttpStatus.OK))
                     .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        }
+            return notificacionService.findByReserva(cedula)
+                    .map(notificaciones -> new ResponseEntity<>(notificaciones, HttpStatus.OK))
+                    .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+
         }
 }
