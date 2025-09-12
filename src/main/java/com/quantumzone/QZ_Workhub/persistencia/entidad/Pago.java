@@ -16,7 +16,7 @@ public class Pago {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_pago", nullable = false)
-    private Integer idPago;
+    private Long idPago;
 
     @Column(name = "monto", nullable = false)
     private Double monto;
@@ -35,67 +35,4 @@ public class Pago {
     @ManyToOne
     @JoinColumn(name = "id_reserva", nullable = false)
     private Reserva reserva;
-
-    /*
-    // Constructor vacío
-    public Pago() {}
-
-    // Constructor con parámetros
-    public Pago(Double monto, LocalDateTime fechaPago, MetodoPago metodoPago, EstadoPago estadoPago, Reserva reserva) {
-        this.monto = monto;
-        this.fechaPago = fechaPago;
-        this.metodoPago = metodoPago;
-        this.estadoPago = estadoPago;
-        this.reserva = reserva;
-    }
-
-    // Getters y Setters
-    public Integer getIdPago() {
-        return idPago;
-    }
-
-    public void setIdPago(Integer idPago) {
-        this.idPago = idPago;
-    }
-
-    public Double getMonto() {
-        return monto;
-    }
-
-    public void setMonto(Double monto) {
-        this.monto = monto;
-    }
-
-    public LocalDateTime getFechaPago() {
-        return fechaPago;
-    }
-
-    public void setFechaPago(LocalDateTime fechaPago) {
-        this.fechaPago = fechaPago;
-    }
-
-    public MetodoPago getMetodoPago() {
-        return metodoPago;
-    }
-
-    public void setMetodoPago(MetodoPago metodoPago) {
-        this.metodoPago = metodoPago;
-    }
-
-    public EstadoPago getEstadoPago() {
-        return estadoPago;
-    }
-
-    public void setEstadoPago(EstadoPago estadoPago) {
-        this.estadoPago = estadoPago;
-    }
-
-    public Reserva getReserva() {
-        return reserva;
-    }
-
-    public void setReserva(Reserva reserva) {
-        this.reserva = reserva;
-    }
-    */
 }

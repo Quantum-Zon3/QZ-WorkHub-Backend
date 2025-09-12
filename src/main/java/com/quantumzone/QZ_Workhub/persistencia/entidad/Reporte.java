@@ -16,7 +16,7 @@ public class Reporte {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_reporte", nullable = false)
-    private Integer idReporte;
+    private Long idReporte;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "motivo", nullable = false)

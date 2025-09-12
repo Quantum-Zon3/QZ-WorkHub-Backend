@@ -16,7 +16,7 @@ public class Recurso {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_recurso", nullable = false)
-    private Integer idRecurso;
+    private Long idRecurso;
 
     @Column(name = "nombre", length = 45, nullable = false)
     private String nombre;
