@@ -12,5 +12,5 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     /**
      * Buscar por cantidad de visitantes
      */
-    Optional<List<Reserva>> findByCantidadVisitantesAsc(Integer cantidadVisitantes);
+    Optional<List<Reserva>> findByCantidadVisitantes(Integer cantidadVisitantes);
 }
