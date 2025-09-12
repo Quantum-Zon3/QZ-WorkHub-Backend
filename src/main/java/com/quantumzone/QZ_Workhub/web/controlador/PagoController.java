@@ -3,9 +3,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.quantumzone.QZ_Workhub.dominio.servicio.PagoService;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Notificacion;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Pago;
 //imports de anotacion springboot
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Reserva;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,7 +53,7 @@ public class PagoController {
             @ApiResponse(responseCode = "200", description = "Pago encontrado"),
             @ApiResponse(responseCode = "404", description = "Pago no encontrado")
     })
-    public ResponseEntity<Pago> getPagoById(@PathVariable @Parameter(description = "ID del pago") int id) {
+    public ResponseEntity<Pago> getPagoById(@PathVariable @Parameter(description = "ID del pago") Long id) {
         return pagoService.findById(id)
                 .map(pago -> new ResponseEntity<>(pago, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -74,11 +77,10 @@ public class PagoController {
             @ApiResponse(responseCode = "404", description = "Pago no encontrado")
     })
     public ResponseEntity<Pago> updatePago(
-            @PathVariable @Parameter(description = "ID del pago") int id,
+            @PathVariable @Parameter(description = "ID del pago") Long id,
             @RequestBody @Parameter(description = "Datos actualizados del pago") Pago pago) {
-        return pagoService.update(id, pago)
-                .map(updatedPago -> new ResponseEntity<>(updatedPago, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        Pago pagoActualizada = pagoService.update(pago);
+        return new ResponseEntity<>(pagoActualizada, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -87,11 +89,13 @@ public class PagoController {
             @ApiResponse(responseCode = "204", description = "Pago eliminado con éxito"),
             @ApiResponse(responseCode = "404", description = "Pago no encontrado")
     })
-    public ResponseEntity<Void> deletePago(@PathVariable @Parameter(description = "ID del pago") int id) {
-        boolean pagoEliminado = pagoService.deleteById(id);
-        return pagoEliminado
-                ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<Void> deletePago(@PathVariable @Parameter(description = "ID del pago") Long id) {
+        try {
+            pagoService.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/buscar")
@@ -101,14 +105,17 @@ public class PagoController {
             @ApiResponse(responseCode = "400", description = "Parámetros inválidos")
     })
     public ResponseEntity<List<Pago>> buscarPagos(
-            @RequestParam(required = false) @Parameter(description = "Monto del pago") Double monto,
-            @RequestParam(required = false) @Parameter(description = "Fecha del pago") LocalDate fecha,
-            @RequestParam(required = false) @Parameter(description = "Método de pago") String metodo,
-            @RequestParam(required = false) @Parameter(description = "ID del usuario asociado") Integer usuarioId) {
+            @RequestParam(required = false) @Parameter(description = "Reserva completa") Reserva reserva,
+            @RequestParam(required = false) @Parameter(description = "Cedula del usuario asociado con la reserva") Long cedula) {
+        if(reserva != null) {
+            return pagoService.findByReserva(reserva)
+                    .map(notificaciones -> new ResponseEntity<>(notificaciones, HttpStatus.OK))
+                    .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
-        return pagoService.findByFilters(monto, fecha, metodo, usuarioId)
-                .map(pagos -> new ResponseEntity<>(pagos, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        }
+            return pagoService.findByReservaUsuarioCedula(cedula)
+                    .map(notificaciones -> new ResponseEntity<>(notificaciones, HttpStatus.OK))
+                    .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
 }

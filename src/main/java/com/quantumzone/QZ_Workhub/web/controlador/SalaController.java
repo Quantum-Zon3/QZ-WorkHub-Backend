@@ -3,6 +3,7 @@ package com.quantumzone.QZ_Workhub.web.controlador;
 import com.quantumzone.QZ_Workhub.dominio.servicio.SalaService;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Sala;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,7 +51,7 @@ public class SalaController {
             @ApiResponse(responseCode = "404", description = "Sala no encontrada")
     })
     public ResponseEntity<Sala> getSalaById(
-            @PathVariable @Parameter(description = "ID de la sala") int id) {
+            @PathVariable @Parameter(description = "ID de la sala") Long id) {
         return salaService.findById(id)
                 .map(sala -> new ResponseEntity<>(sala, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
@@ -75,11 +76,10 @@ public class SalaController {
             @ApiResponse(responseCode = "404", description = "Sala no encontrada")
     })
     public ResponseEntity<Sala> updateSala(
-            @PathVariable @Parameter(description = "ID de la sala") int id,
+            @PathVariable @Parameter(description = "ID de la sala") Long id,
             @RequestBody @Parameter(description = "Datos actualizados de la sala") Sala sala) {
-        return salaService.update(id, sala)
-                .map(updatedSala -> new ResponseEntity<>(updatedSala, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        Sala salaActualizada = salaService.update(sala);
+         return new ResponseEntity<>(salaActualizada, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -89,11 +89,13 @@ public class SalaController {
             @ApiResponse(responseCode = "404", description = "Sala no encontrada")
     })
     public ResponseEntity<Void> deleteSala(
-            @PathVariable @Parameter(description = "ID de la sala") int id) {
-        boolean eliminada = salaService.deleteById(id);
-        return eliminada
-                ? new ResponseEntity<>(HttpStatus.NO_CONTENT)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            @PathVariable @Parameter(description = "ID de la sala") Long id) {
+        try {
+            salaService.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/buscar")
@@ -103,11 +105,9 @@ public class SalaController {
             @ApiResponse(responseCode = "400", description = "Parámetros inválidos")
     })
     public ResponseEntity<List<Sala>> buscarSalas(
-            @RequestParam(required = false) @Parameter(description = "Nombre de la sala") String nombre,
-            @RequestParam(required = false) @Parameter(description = "Capacidad mínima de la sala") Integer capacidad,
-            @RequestParam(required = false) @Parameter(description = "Ubicación de la sala") String ubicacion) {
+            @RequestParam(required = false) @Parameter(description = "Nombre de la sala") String nombre) {
 
-        return salaService.findByFilters(nombre, capacidad, ubicacion)
+        return salaService.findByNombre(nombre)
                 .map(salas -> new ResponseEntity<>(salas, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
