@@ -13,11 +13,14 @@ public class SalaDto {
     @Schema(description = "Identificador único de la sala", example = "1")
     private Long idSala;
 
-    @Schema(description = "nombre que recibe la sala", example = "sala de audiovisuales", required = true, maxLength = 20)
+    @Schema(description = "nombre que recibe la sala", example = "sala de audiovisuales", required = true, maxLength = 45)
     private String nombre;
 
     @Schema(description = "capacidad de ocupantes en la sala", example = "10", required = true)
     private Integer capacidad;
+
+    @Schema(description = "descripcion de la sala", example = "amplia con ventanales grandes", required = true, maxLength = 45)
+    private String descripcion;
 
     @Schema(description = "precio de renta del espacio", example = "20000", required = true)
     private Float precio;

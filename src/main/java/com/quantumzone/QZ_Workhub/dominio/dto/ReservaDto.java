@@ -20,7 +20,7 @@ public class ReservaDto {
     @Schema(description = "fecha de fin de la reserva", example = "2025-09-18T11:30:00", required = true)
     private LocalDateTime fechaFin;
 
-    @Schema(description = "monto total de la reserva", example = "43000", required = true)
+    @Schema(description = "monto total de la reserva", example = "43000", required = true, maxLength = 45)
     private Double montoTotal;
 
     @Schema(description = "cantidad de visitantes en la reserva", example = "10", required = true)

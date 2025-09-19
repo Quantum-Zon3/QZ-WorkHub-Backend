@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Schema(description = "Informacion de recursos reservados")
 public class RecursoReservadoDto {
-    @Schema(description = "identificador de un recursoReservado")
+    @Schema(description = "identificador de un recursoReservado", example = "1")
     private Long id;
 }
