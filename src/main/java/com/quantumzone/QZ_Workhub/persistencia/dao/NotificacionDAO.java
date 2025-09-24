@@ -36,7 +36,7 @@ public class NotificacionDAO {
         return notificacionRepository.findById(id).map(notificacion -> {
             notificacionMapper.updateNotificacion(notificacionDto, notificacion);
             Notificacion notiActualizada = notificacionRepository.save(notificacion);
-            return notificacionMapper.toNotificacionDto(notificacion);
+            return notificacionMapper.toNotificacionDto(notiActualizada);
         });
     }
 
