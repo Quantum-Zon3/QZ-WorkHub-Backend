@@ -24,8 +24,8 @@ public class Reserva {
     @Column(name = "fecha_fin", nullable = false)
     private LocalDateTime fechaFin;
 
-    @Column(name = "monto_total", length = 45)
-    private String montoTotal;
+    @Column(name = "monto_total", nullable = false)
+    private Double montoTotal;
 
     @Column(name = "cantidad_visitantes", nullable = false)
     private Integer cantidadVisitantes;
