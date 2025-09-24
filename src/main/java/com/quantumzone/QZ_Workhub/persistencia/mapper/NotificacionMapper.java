@@ -2,6 +2,7 @@ package com.quantumzone.QZ_Workhub.persistencia.mapper;
 
 import com.quantumzone.QZ_Workhub.dominio.dto.NotificacionDto;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Notificacion;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Reserva;
 import org.mapstruct.*;
 import java.util.List;
 /**
@@ -27,13 +28,11 @@ public interface NotificacionMapper {
      * - reserva: Se ignora para evitar referencia circular.
      *   (Si necesitas mostrar info básica de la reserva, puedes crear un ReservaDto reducido)
      */
-    @Mapping(target = "reserva", ignore = true)
     NotificacionDto toNotificacionDto(Notificacion notificacion);
 
     /**
      * Convierte lista de Notificacion a lista de NotificacionDTO
      */
-    @Mapping(target = "reserva", ignore = true)
     List<NotificacionDto> toNotificacionDtos(List<Notificacion> notificaciones);
 
     /**
@@ -46,7 +45,7 @@ public interface NotificacionMapper {
      * - reserva: Se debe asignar manualmente en el servicio si es necesario
      */
     @Mapping(target = "idNotificacion", ignore = true)
-    @Mapping(target = "reserva", ignore = true)
+    @Mapping(target = "reserva", source = "id_reserva", qualifiedByName = "crearReservaPorId")
     Notificacion toNotificacion(NotificacionDto notificacionDto);
 
     /**
@@ -63,5 +62,20 @@ public interface NotificacionMapper {
     @Mapping(target = "reserva", ignore = true)        // Relación manejada en servicio
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateNotificacion(NotificacionDto notificacionDto, @MappingTarget Notificacion notificacion);
+    /**
+     * METODO AUXILIAR: Crea SellerEntity con solo el ID
+     *
+     *
+     * @Named: Permite referenciar este metodo en otros mapeos
+     */
+    @Named("crearReservaPorId")
+    default Reserva createReservaFromId(Long idReserva) {
+        if (idReserva == null) {
+            return null;
+        }
+        Reserva reserva = new Reserva();
+        reserva.setIdReserva(idReserva);
+        return reserva;
+    }
 }
 
