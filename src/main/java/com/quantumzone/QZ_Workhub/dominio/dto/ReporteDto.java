@@ -21,4 +21,10 @@ public class ReporteDto {
 
     @Schema(description = "fecha del reporte", example = "2025-09-18T11:30:00", required = true)
     private LocalDateTime fecha;
+
+    @Schema(description = "Cedula del usuario del reporte", example = "1094897822", required = true)
+    private Long cedula;
+
+    @Schema(description = "ID de la reserva creada", example = "1", required = true)
+    private Long idReserva;
 }
