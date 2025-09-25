@@ -38,7 +38,7 @@ public class NotificacionService{
 
         // Crear producto
         NotificacionDto notificacionCreadda = notificacionDAO.save(notificacionDto);
-        log.info("Producto creado exitosamente con ID: {}", notificacionDto.getIdNoti());
+        log.info("Producto creado exitosamente con ID: {}", notificacionDto.getIdNotificacion());
 
         return notificacionCreadda;
     }
@@ -119,7 +119,7 @@ public class NotificacionService{
             throw new IllegalArgumentException("La descripcion de la notificacion es obligatorio");
         }
 
-        if (notificacionDto.getReserva() == null) {
+        if (notificacionDto.getIdReserva() == null) {
             throw new IllegalArgumentException("El reserva es obligatorio");
         }
 
