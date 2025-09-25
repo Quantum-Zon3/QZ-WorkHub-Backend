@@ -1,56 +1,136 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.Notificacion;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.Reserva;
+import com.quantumzone.QZ_Workhub.dominio.dto.NotificacionDto;
+import com.quantumzone.QZ_Workhub.persistencia.dao.NotificacionDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.quantumzone.QZ_Workhub.persistencia.repositorio.NotificacionRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class NotificacionService {
+@Transactional
+@Slf4j
+public class NotificacionService{
 
-    private final NotificacionRepository notificacionRepository;
+    private final NotificacionDAO notificacionDAO;
 
     @Autowired
-    public NotificacionService(NotificacionRepository notificacionRepository) {
-        this.notificacionRepository = notificacionRepository;
+    public NotificacionService(NotificacionDAO notificacionDAO) {
+        this.notificacionDAO = notificacionDAO;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
     private void initSampleData() {
-
-    }
-    // Guardar una notificación
-    public Notificacion save(Notificacion notificacion) {
-        return notificacionRepository.save(notificacion);
     }
 
-    // Encontrar una notificación por id
-    public Optional<Notificacion> findById(Long id) {
-        return notificacionRepository.findById(id);
+    /**
+     * Crear una nueva notificacion con validaciones completas
+     */
+
+    public NotificacionDto save(NotificacionDto notificacionDto) {
+        log.info("Creando una nueva notificacion: {}", notificacionDto.getMotivo());
+
+        // Validar datos de la notificacion
+        validarNotificacion(notificacionDto);
+
+        // Crear producto
+        NotificacionDto notificacionCreadda = notificacionDAO.save(notificacionDto);
+        log.info("Producto creado exitosamente con ID: {}", notificacionDto.getIdNoti());
+
+        return notificacionCreadda;
+    }
+    /**
+     * Buscar notificacion por ID
+     */
+    @Transactional(readOnly = true)
+    public NotificacionDto findById(Long id) {
+        log.debug("Buscando producto por ID: {}", id);
+
+        return notificacionDAO.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("Notificacion no encontrada con ID: {}", id);
+                    return new RuntimeException("Notificacion no encontrada con ID: " + id);
+                });
     }
 
-    // Listar todas las notificaciones
-    public List<Notificacion> findAll() {
-        return notificacionRepository.findAll();
+    /**
+     * Obtener todos las notificaciones
+     */
+    @Transactional(readOnly = true)
+    public List<NotificacionDto> findAll() {
+        log.debug("Obteniendo todos las notificaciones: {}", notificacionDAO.findAll().size());
+        return notificacionDAO.findAll();
     }
 
-    // Eliminar una notificación por id
-    public void deleteById(Long id) { notificacionRepository.deleteById(id);
+    /**
+     * Eliminar notificacion
+     */
+    public void deleteNotificacion(Long id) {
+        log.info("Eliminando notificacion ID: {}", id);
+
+        // Verificar que el notificacion existe
+        findById(id);
+
+        // Eliminar producto
+        boolean deleted = notificacionDAO.delete(id);
+        if (!deleted) {
+            throw new RuntimeException("Error al eliminar producto con ID: " + id);
+        }
+
+        log.info("Producto eliminado exitosamente ID: {}", id);
     }
 
-    // Actualizar una notificación
-    public Notificacion update(Notificacion notificacion) {
-        return notificacionRepository.save(notificacion);
-    }
+    /**
+     * Actualizar notificacion con validaciones
+     */
+    public NotificacionDto updateNotificacion(Long id, NotificacionDto notificacionDto) {
+        log.info("Actualizando producto ID: {}", id);
 
-    // Buscar notificaciones por filtros
-    public Optional<List<Notificacion>> findByReserva(Reserva reserva) {
-        return notificacionRepository.findByReserva(reserva);
+        // Verificar que el notificacion existe
+        findById(id);
+
+        // Validar datos de actualización
+        validarNotificacion(notificacionDto);
+
+        // Actualizar
+        NotificacionDto updatedProduct = notificacionDAO.update(id, notificacionDto)
+                .orElseThrow(() -> new RuntimeException("Error al actualizar producto"));
+
+        log.info("Producto actualizado exitosamente ID: {}", id);
+        return updatedProduct;
     }
-    public Optional<List<Notificacion>> findByReserva(Long cedula) {
-        return notificacionRepository.findByReservaUsuarioCedula(cedula);
+    /**
+     * METODO PRIVADO: Validar datos de creación de una notificacion
+     */
+    private void validarNotificacion(NotificacionDto notificacionDto) {
+        if (notificacionDto.getMotivo() == null || notificacionDto.getMotivo().trim().isEmpty()) {
+            throw new IllegalArgumentException("El motivo de la notificacion es obligatorio");
+        }
+
+        if (notificacionDto.getFecha() == null || notificacionDto.getFecha().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("La fecha de la notificación es obligatoria y debe ser válida");
+        }
+
+
+        if (notificacionDto.getDescripcion() == null || notificacionDto.getDescripcion().trim().isEmpty()) {
+            throw new IllegalArgumentException("La descripcion de la notificacion es obligatorio");
+        }
+
+        if (notificacionDto.getReserva() == null) {
+            throw new IllegalArgumentException("El reserva es obligatorio");
+        }
+
+        // Validar longitud del motivo
+        if (notificacionDto.getMotivo().length() > 45) {
+            throw new IllegalArgumentException("El motivo no puede exceder 45 caracteres");
+        }
+        // Validar longitud del descripcion
+        if (notificacionDto.getDescripcion().length() > 200) {
+            throw new IllegalArgumentException("El motivo no puede exceder 200 caracteres");
+        }
     }
 
 }
