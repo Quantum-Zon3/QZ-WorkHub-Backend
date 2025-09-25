@@ -23,7 +23,7 @@ public class NotificacionDto {
 
     @Schema(description = "mensaje de la noti", example = "Su reserva a sido confirmada a las 14:00 el martes", required = true, maxLength = 200)
     private String descripcion;
-    
+
     @Schema(description = "ID de la reserva que se esta haciendo", example = "1", required = true)
     private Long idReserva;
 }

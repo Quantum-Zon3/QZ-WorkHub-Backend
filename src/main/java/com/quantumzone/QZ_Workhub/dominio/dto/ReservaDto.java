@@ -25,4 +25,10 @@ public class ReservaDto {
 
     @Schema(description = "cantidad de visitantes en la reserva", example = "10", required = true)
     private Integer cantidadVisitantes;
+
+    @Schema(description = "Cedula del usuario que creo reserva", example = "1094897822", required = true)
+    private Long cedula;
+
+    @Schema(description = "ID de la sala que se va a utilizar", example = "1", required = true)
+    private Long idSala;
 }
