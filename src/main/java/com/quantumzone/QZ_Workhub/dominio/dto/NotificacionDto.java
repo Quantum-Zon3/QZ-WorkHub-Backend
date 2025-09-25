@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Schema(description = "descripcion de notificacion")
 public class NotificacionDto {
     @Schema(description = "id de notificacion", example = "1")
-    private Long idNoti;
+    private Long idNotificacion;
 
     @Schema(description = "motivo de la notificaion", example = "Reserva confirmada", required = true, maxLength = 45)
     private String motivo;
@@ -23,4 +23,7 @@ public class NotificacionDto {
 
     @Schema(description = "mensaje de la noti", example = "Su reserva a sido confirmada a las 14:00 el martes", required = true, maxLength = 200)
     private String descripcion;
+    
+    @Schema(description = "ID de la reserva que se esta haciendo", example = "1", required = true)
+    private Long idReserva;
 }
