@@ -55,9 +55,12 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
     public ResponseEntity<UsuarioDto> findById(@PathVariable @Parameter(description = "ID del usuario") Long id) {
-        return usuarioService.findById(id)
-                .map(usuario -> new ResponseEntity<>(usuario, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        try {
+            UsuarioDto product = usuarioService.findById(id);
+            return ResponseEntity.ok(product);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
@@ -80,7 +83,7 @@ public class UsuarioController {
     })
     public ResponseEntity<UsuarioDto> update(
             @RequestBody @Parameter(description = "Datos actualizados del usuario") UsuarioDto usuario) {
-        UsuarioDto updatedUsuario = usuarioService.update(usuario);
+        UsuarioDto updatedUsuario = usuarioService.update(usuario.getCedula(), usuario);
         return new ResponseEntity<>(updatedUsuario, HttpStatus.OK);
     }
 
@@ -92,13 +95,14 @@ public class UsuarioController {
     })
     public ResponseEntity<Void> delete(
             @PathVariable @Parameter(description = "ID del usuario") Long id) {
-        if (usuarioService.findById(id).isPresent()) {
-            usuarioService.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            usuarioService.deleteUsuario(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
+    /*
     @GetMapping("/rol")
     @Operation(summary = "Buscar usuarios por rol", description = "Devuelve los usuarios asociados a un rol específico.")
     @ApiResponses(value = {
@@ -112,4 +116,5 @@ public class UsuarioController {
                 .map(usuarios -> new ResponseEntity<>(usuarios, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+     */
 }
