@@ -32,7 +32,7 @@ public class Pago {
     @Column(name = "estado_pago", nullable = false)
     private EstadoPago estadoPago;
 
-    @ManyToOne
-    @JoinColumn(name = "id_reserva", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "id_reserva", referencedColumnName = "idReserva")
     private Reserva reserva;
 }
