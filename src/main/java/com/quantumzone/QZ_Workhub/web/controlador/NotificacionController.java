@@ -30,7 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Notificacion", description = "Controlador de notificaciones")
 public class NotificacionController {
 
-    private final NotificacionService notificacionService;
+    /*private final NotificacionService notificacionService;
 
     @Autowired
     public NotificacionController(NotificacionService notificacionService) {
@@ -116,5 +116,5 @@ public class NotificacionController {
                     .map(notificaciones -> new ResponseEntity<>(notificaciones, HttpStatus.OK))
                     .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
 
-        }
+        }*/
 }

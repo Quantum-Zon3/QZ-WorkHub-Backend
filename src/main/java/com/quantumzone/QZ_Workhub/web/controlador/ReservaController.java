@@ -22,7 +22,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.time.LocalDate;
-import java.util.List;@RestController
+import java.util.List;
+@RestController
 @RequestMapping("/qzwork_hub/reservas")
 @Tag(name = "Reserva", description = "Controlador de reservas")
 public class ReservaController {
@@ -102,7 +103,7 @@ public class ReservaController {
     public ResponseEntity<List<Reserva>> buscarReservas(
             @RequestParam(required = true) @Parameter(description = "Cantidad mínima de visitantes") Integer filtro) {
 
-        return reservaService.findByCantidadVisitantesAsc(filtro)
+        return reservaService.findByCantidadVisitantes(filtro)
                 .map(reservas -> new ResponseEntity<>(reservas, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
