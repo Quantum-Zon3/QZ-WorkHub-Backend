@@ -1,20 +1,41 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
+import com.quantumzone.QZ_Workhub.dominio.dto.UsuarioDto;
 import com.quantumzone.QZ_Workhub.dominio.enums.Rol;
+import com.quantumzone.QZ_Workhub.persistencia.dao.UsuarioDAO;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Usuario;
 import com.quantumzone.QZ_Workhub.persistencia.repositorio.UsuarioRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
+/**
+ * Implementación del servicio de vendedores
+ *
+ * ANOTACIONES:
+ * @Service - Marca como componente de servicio de Spring
+ * @Transactional - Manejo automático de transacciones
+ * @RequiredArgsConstructor - Lombok genera constructor con dependencias final
+ * @Slf4j - Lombok genera logger automáticamente
+ *
+ * PRINCIPIOS APLICADOS:
+ * - Inversión de Dependencias: Depende de SellerDAO (abstracción)
+ * - Single Responsibility: Solo lógica de negocio de vendedores
+ * - Fail Fast: Validaciones tempranas y excepciones claras
+ */
 @Service
+@Transactional
+@Slf4j
 public class UsuarioService {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioDAO usuarioDAO;
 
     @Autowired
-    public UsuarioService(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
+    public UsuarioService(UsuarioDAO usuarioDAO) {
+        this.usuarioDAO = usuarioDAO;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -22,33 +43,176 @@ public class UsuarioService {
     private void initSampleData() {
         // Aquí puedes cargar datos iniciales de prueba si quieres
     }
+    /**
+     * Crear un nuevo usuario con validaciones de negocio
+     */
+    public UsuarioDto save(UsuarioDto usuarioDto) {
+        log.info("Creando nuevo usuario con cedula: {}", usuarioDto.getCedula());
 
-    // Guardar un usuario
-    public Usuario save(Usuario usuario) {
-        return usuarioRepository.save(usuario);
+        // Validación de negocio: Email único
+        if (usuarioDAO.findById(usuarioDto.getCedula()).isPresent()) {
+            log.warn("Intento de crear usuario con email duplicado: {}", usuarioDto.getCedula());
+            throw new IllegalArgumentException("Ya existe un usuario con el email: " + usuarioDto.getCedula());
+        }
+
+        // Validaciones adicionales de negocio
+        validarUsuario(usuarioDto);
+
+        // Crear usuario
+        UsuarioDto usaurioCreado = usuarioDAO.save(usuarioDto);
+        log.info("Usuario creado exitosamente con ID: {}", usaurioCreado.getCedula());
+
+        return usaurioCreado;
+    }
+    /**
+     * Buscar usuario por ID con manejo de errores
+     */
+    @Transactional(readOnly = true)
+    public UsuarioDto findById(Long cedula) {
+        log.debug("Buscando vendedor por ID: {}", cedula);
+
+        return usuarioDAO.findById(cedula)
+                .orElseThrow(() -> {
+                    log.warn("Vendedor no encontrado con ID: {}", cedula);
+                    return new RuntimeException("Vendedor no encontrado con ID: " + cedula);
+                });
     }
 
-    // Encontrar un usuario por id
-    public Optional<Usuario> findById(Long id) {
-        return usuarioRepository.findById(id);
+    /**
+     * Obtener todos los Usuarios
+     */
+    @Transactional(readOnly = true)
+    public List<UsuarioDto> findAll() {
+        log.debug("Obteniendo todos los vendedores");
+        return usuarioDAO.findAll();
     }
 
-    // Listar todos los usuarios
-    public List<Usuario> findAll() {
-        return usuarioRepository.findAll();
+    /**
+     * Eliminar usuarios con validaciones de negocio
+     */
+    public void deleteUsuario(Long cedula) {
+        log.info("Eliminando usuarios ID: {}", cedula);
+
+        // Verificar que el vendedor existe
+        UsuarioDto seller = findById(cedula);
+        /*
+        Regla de negocio: No eliminar si tiene productos
+        Long productCount = UsuarioDao.countProductsBySellerId(id);
+        if (productCount > 0) {
+            log.warn("Intento de eliminar vendedor con productos. ID: {}, Productos: {}", id, productCount);
+            throw new IllegalStateException(
+                    String.format("No se puede eliminar el vendedor porque tiene %d producto(s) asociado(s)", productCount)
+            );
+        }*/
+        // Eliminar vendedor
+        boolean deleted = usuarioDAO.delete(cedula);
+        if (!deleted) {
+            throw new RuntimeException("Error al eliminar usaurio con ID: " + cedula);
+        }
+
+        log.info("usaurio eliminado exitosamente ID: {}", cedula);
+    }
+    /**
+     * Actualizar usuario con validaciones
+     */
+    public UsuarioDto updateSeller(Long cedula, UsuarioDto updateDTO) {
+        log.info("Actualizando usaurio ID: {}", cedula);
+
+        // Verificar que el usaurio existe
+        if (!usuarioDAO.findById(cedula).isPresent()) {
+            log.warn("Intento de actualizar usaurio inexistente ID: {}", cedula);
+            throw new RuntimeException("usaurio no encontrado con ID: " + cedula);
+        }
+
+        // Validaciones de negocio
+        validarUsuario(updateDTO);
+
+        // Actualizar
+        UsuarioDto updatedSeller = usuarioDAO.update(cedula, updateDTO)
+                .orElseThrow(() -> new RuntimeException("Error al actualizar usuario"));
+
+        log.info("Usuario actualizado exitosamente ID: {}", cedula);
+        return updatedSeller;
+    }
+    
+    /**
+     * METODO PRIVADO: Validar datos de creación
+     */
+    private void validarUsuario(UsuarioDto usuarioDto) {
+        // Validar cédula
+        if (usuarioDto.getCedula() == null || usuarioDto.getCedula() <= 0) {
+            throw new IllegalArgumentException("La cédula es obligatoria y debe ser un número positivo");
+        }
+
+        // Validar nombre
+        if (usuarioDto.getNombre() == null || usuarioDto.getNombre().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del usuario es obligatorio");
+        }
+        if (usuarioDto.getNombre().length() > 45) {
+            throw new IllegalArgumentException("El nombre no puede exceder 45 caracteres");
+        }
+
+        // Validar apellido
+        if (usuarioDto.getApellido() == null || usuarioDto.getApellido().trim().isEmpty()) {
+            throw new IllegalArgumentException("El apellido del usuario es obligatorio");
+        }
+        if (usuarioDto.getApellido().length() > 45) {
+            throw new IllegalArgumentException("El apellido no puede exceder 45 caracteres");
+        }
+
+        // Validar email
+        if (usuarioDto.getEmail() == null || usuarioDto.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("El email del usuario es obligatorio");
+        }
+        if (usuarioDto.getEmail().length() > 45) {
+            throw new IllegalArgumentException("El email no puede exceder 45 caracteres");
+        }
+        if (!isValidEmail(usuarioDto.getEmail())) {
+            throw new IllegalArgumentException("El formato del email no es válido");
+        }
+
+        // Validar rol
+        if (usuarioDto.getRol() == null) {
+            throw new IllegalArgumentException("El rol del usuario es obligatorio");
+        }
+
+        // Validar contraseña
+        if (usuarioDto.getContraseña() == null || usuarioDto.getContraseña().trim().isEmpty()) {
+            throw new IllegalArgumentException("La contraseña es obligatoria");
+        }
+        if (usuarioDto.getContraseña().length() < 8 || usuarioDto.getContraseña().length() > 45) {
+            throw new IllegalArgumentException("La contraseña debe tener entre 8 y 45 caracteres");
+        }
+        // Ejemplo: validar que tenga letras y números
+        if (!usuarioDto.getContraseña().matches("^(?=.*[A-Za-z])(?=.*\\d).+$")) {
+            throw new IllegalArgumentException("La contraseña debe contener al menos una letra y un número");
+        }
+
+        // Validar teléfono
+        if (usuarioDto.getTelefono() == null || usuarioDto.getTelefono().trim().isEmpty()) {
+            throw new IllegalArgumentException("El teléfono es obligatorio");
+        }
+        if (usuarioDto.getTelefono().length() > 45) {
+            throw new IllegalArgumentException("El teléfono no puede exceder 45 caracteres");
+        }
+        if (!usuarioDto.getTelefono().matches("^[0-9+\\- ]+$")) {
+            throw new IllegalArgumentException("El teléfono solo puede contener números, espacios, '+' o '-'");
+        }
+
+        // Validar fecha de registro
+        if (usuarioDto.getFechaRegistro() == null) {
+            throw new IllegalArgumentException("La fecha de registro es obligatoria");
+        }
+        if (usuarioDto.getFechaRegistro().isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("La fecha de registro no puede ser en el futuro");
+        }
     }
 
-    // Eliminar un usuario por id
-    public void deleteById(Long id) {usuarioRepository.deleteById(id);
-    }
-
-    // Actualizar un usuario
-    public Usuario update(Usuario usuario) {
-        return usuarioRepository.save(usuario);
-    }
-
-    // Buscar usuario por filtros
-    public Optional<List<Usuario>> findUsuarioByRol(Rol rol) {
-        return usuarioRepository.findUsuarioByRol(rol);
+    /**
+     * METODO PRIVADO: Validar formato de email básico
+     */
+    private boolean isValidEmail(String email) {
+        // Validación básica de email
+        return email.contains("@") && email.contains(".");
     }
 }
