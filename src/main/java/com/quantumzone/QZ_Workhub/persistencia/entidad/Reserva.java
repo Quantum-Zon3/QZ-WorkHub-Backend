@@ -52,6 +52,6 @@ public class Reserva {
     private List<RecursoReservado> recursosReservados;
 
     // Relación bidireccional: una reserva tiene un pago
-    @OneToOne(mappedBy = "reserva", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "reserva", cascade = CascadeType.ALL, orphanRemoval = true)
     private Pago pago;
 }
