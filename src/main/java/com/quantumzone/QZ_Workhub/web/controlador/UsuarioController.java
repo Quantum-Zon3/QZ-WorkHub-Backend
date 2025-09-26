@@ -2,6 +2,7 @@ package com.quantumzone.QZ_Workhub.web.controlador;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.quantumzone.QZ_Workhub.dominio.dto.UsuarioDto;
 import com.quantumzone.QZ_Workhub.dominio.enums.Rol;
 import com.quantumzone.QZ_Workhub.dominio.servicio.UsuarioService;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Usuario;
@@ -43,7 +44,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida con éxito"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<List<Usuario>> getAllUsuarios() {
+    public ResponseEntity<List<UsuarioDto>> findAll() {
         return new ResponseEntity<>(usuarioService.findAll(), HttpStatus.OK);
     }
 
@@ -53,10 +54,13 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
-    public ResponseEntity<Usuario> getUsuarioById(@PathVariable @Parameter(description = "ID del usuario") Long id) {
-        return usuarioService.findById(id)
-                .map(usuario -> new ResponseEntity<>(usuario, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<UsuarioDto> findById(@PathVariable @Parameter(description = "ID del usuario") Long id) {
+        try {
+            UsuarioDto product = usuarioService.findById(id);
+            return ResponseEntity.ok(product);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
@@ -65,9 +69,9 @@ public class UsuarioController {
             @ApiResponse(responseCode = "201", description = "Usuario creado con éxito"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
-    public ResponseEntity<Usuario> createUsuario(
-            @RequestBody @Parameter(description = "Datos del usuario a crear") Usuario usuario) {
-        Usuario nuevoUsuario = usuarioService.save(usuario);
+    public ResponseEntity<UsuarioDto> save(
+            @RequestBody @Parameter(description = "Datos del usuario a crear") UsuarioDto usuario) {
+        UsuarioDto nuevoUsuario = usuarioService.save(usuario);
         return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
     }
 
@@ -77,9 +81,9 @@ public class UsuarioController {
             @ApiResponse(responseCode = "200", description = "Usuario actualizado con éxito"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
-    public ResponseEntity<Usuario> updateUsuario(
-            @RequestBody @Parameter(description = "Datos actualizados del usuario") Usuario usuario) {
-        Usuario updatedUsuario = usuarioService.update(usuario);
+    public ResponseEntity<UsuarioDto> update(
+            @RequestBody @Parameter(description = "Datos actualizados del usuario") UsuarioDto usuario) {
+        UsuarioDto updatedUsuario = usuarioService.update(usuario.getCedula(), usuario);
         return new ResponseEntity<>(updatedUsuario, HttpStatus.OK);
     }
 
@@ -89,26 +93,28 @@ public class UsuarioController {
             @ApiResponse(responseCode = "204", description = "Usuario eliminado con éxito"),
             @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
     })
-    public ResponseEntity<Void> deleteUsuario(
+    public ResponseEntity<Void> delete(
             @PathVariable @Parameter(description = "ID del usuario") Long id) {
-        if (usuarioService.findById(id).isPresent()) {
-            usuarioService.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            usuarioService.deleteUsuario(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
         }
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
-
+    /*
     @GetMapping("/rol")
     @Operation(summary = "Buscar usuarios por rol", description = "Devuelve los usuarios asociados a un rol específico.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Usuarios encontrados"),
             @ApiResponse(responseCode = "404", description = "No se encontraron usuarios con ese rol")
     })
-    public ResponseEntity<List<Usuario>> buscarUsuariosPorRol(
+    public ResponseEntity<List<UsuarioDto>> findByRol(
             @RequestParam @Parameter(description = "Rol del usuario") Rol rol) {
 
         return usuarioService.findUsuarioByRol(rol)
                 .map(usuarios -> new ResponseEntity<>(usuarios, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+     */
 }
