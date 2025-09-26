@@ -29,8 +29,8 @@ public class RecursoReservado {
     @ManyToOne
     @JoinColumn(name = "id_recurso", nullable = false)
     private Recurso recurso;
-    @OneToOne
-    @JoinColumn(name = "id_reserva", referencedColumnName = "idReserva")
+    @ManyToOne
+    @JoinColumn(name = "id_reserva", nullable = false)
     private Reserva reserva;
 
 }
