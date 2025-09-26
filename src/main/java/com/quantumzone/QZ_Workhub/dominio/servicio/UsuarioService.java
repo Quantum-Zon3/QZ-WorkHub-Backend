@@ -115,7 +115,7 @@ public class UsuarioService {
     /**
      * Actualizar usuario con validaciones
      */
-    public UsuarioDto updateSeller(Long cedula, UsuarioDto updateDTO) {
+    public UsuarioDto update(Long cedula, UsuarioDto updateDTO) {
         log.info("Actualizando usaurio ID: {}", cedula);
 
         // Verificar que el usaurio existe
