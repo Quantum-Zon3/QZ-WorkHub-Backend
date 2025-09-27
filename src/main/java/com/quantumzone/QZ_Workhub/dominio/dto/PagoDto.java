@@ -27,7 +27,6 @@ public class PagoDto {
 
     @Schema(description = "estado de pago", example = "Realizado", required = true)
     private EstadoPago estadoPago;
-
     @Schema(description = "ID de la reserva que se creo", example = "1", required = true)
     private Long idReserva;
 }
