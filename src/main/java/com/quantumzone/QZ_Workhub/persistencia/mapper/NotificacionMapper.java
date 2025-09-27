@@ -28,11 +28,21 @@ public interface NotificacionMapper {
      * - reserva: Se ignora para evitar referencia circular.
      *   (Si necesitas mostrar info básica de la reserva, puedes crear un ReservaDto reducido)
      */
+    @Mapping(target = "idNotificacion", source = "idNotificacion")
+    @Mapping(target = "motivo", source = "motivo")
+    @Mapping(target = "fecha", source = "fecha")
+    @Mapping(target = "descripcion", source = "descripcion")
+    @Mapping(target = "idReserva", source = "reserva", qualifiedByName = "createIdFromReserva")
     NotificacionDto toNotificacionDto(Notificacion notificacion);
 
     /**
      * Convierte lista de Notificacion a lista de NotificacionDTO
      */
+    @Mapping(target = "idNotificacion", source = "idNotificacion")
+    @Mapping(target = "motivo", source = "motivo")
+    @Mapping(target = "fecha", source = "fecha")
+    @Mapping(target = "descripcion", source = "descripcion")
+    @Mapping(target = "idReserva", source = "reserva", qualifiedByName = "createIdFromReserva")
     List<NotificacionDto> toNotificacionDtos(List<Notificacion> notificaciones);
 
     /**
@@ -44,6 +54,9 @@ public interface NotificacionMapper {
      * MANEJO DE RELACIONES:
      * - reserva: Se debe asignar manualmente en el servicio si es necesario
      */
+    @Mapping(target = "motivo", source = "motivo")
+    @Mapping(target = "fecha", source = "fecha")
+    @Mapping(target = "descripcion", source = "descripcion")
     @Mapping(target = "idNotificacion", ignore = true)
     @Mapping(target = "reserva", source = "id_reserva", qualifiedByName = "crearReservaPorId")
     Notificacion toNotificacion(NotificacionDto notificacionDto);
@@ -58,17 +71,20 @@ public interface NotificacionMapper {
      * ESTRATEGIA NULL_VALUE_PROPERTY_MAPPING_STRATEGY.IGNORE:
      * - Si un campo en NotificacionDTO es null, no se sobrescribe
      */
+    @Mapping(target = "motivo", source = "motivo")
+    @Mapping(target = "fecha", source = "fecha")
+    @Mapping(target = "descripcion", source = "descripcion")
     @Mapping(target = "idNotificacion", ignore = true) // No puede editar el id
     @Mapping(target = "reserva", ignore = true)        // Relación manejada en servicio
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateNotificacion(NotificacionDto notificacionDto, @MappingTarget Notificacion notificacion);
     /**
-     * METODO AUXILIAR: Crea SellerEntity con solo el ID
+     * METODO AUXILIAR: Crea reserva con solo el ID
      *
      *
      * @Named: Permite referenciar este metodo en otros mapeos
      */
-    @Named("crearReservaPorId")
+    @Named("createReservaFromId")
     default Reserva createReservaFromId(Long idReserva) {
         if (idReserva == null) {
             return null;
@@ -76,6 +92,19 @@ public interface NotificacionMapper {
         Reserva reserva = new Reserva();
         reserva.setIdReserva(idReserva);
         return reserva;
+    }
+    /**
+     * METODO AUXILIAR: obtener la id de la reserva
+     *
+     *
+     * @Named: Permite referenciar este metodo en otros mapeos
+     */
+    @Named("createIdFromReserva")
+    default Long createIdFromReserva(Reserva reserva) {
+        if (reserva == null) {
+            return null;
+        }
+        return reserva.getIdReserva();
     }
 }
 
