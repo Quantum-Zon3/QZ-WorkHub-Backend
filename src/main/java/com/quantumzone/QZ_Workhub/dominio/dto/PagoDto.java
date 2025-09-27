@@ -27,8 +27,4 @@ public class PagoDto {
 
     @Schema(description = "estado de pago", example = "Realizado", required = true)
     private EstadoPago estadoPago;
-
-    @OneToOne
-    @JoinColumn(name = "id_reserva", nullable = false, unique = true)
-    private Reserva reserva;
 }
