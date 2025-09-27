@@ -26,13 +26,23 @@ public interface RecursoMapper {
      * - recursoReservados: No se incluyen en el DTO para evitar referencia circular
      *   (opcionalmente se puede exponer una lista reducida de ids en el DTO)
      */
-    @Mapping(target = "recursoReservados", ignore = true)
+    @Mapping(target = "idRecurso", source = "idRecurso")
+    @Mapping(target = "nombre", source = "nombre")
+    @Mapping(target = "tipoRecurso", source = "tipo")
+    @Mapping(target = "unidades", source = "unidades")
+    @Mapping(target = "descripcion", source = "descripcion")
+    @Mapping(target = "precio", source = "precio")
     RecursoDto toRecursoDto(Recurso recurso);
 
     /**
      * Convierte lista de Recurso a lista de RecursoDTO
      */
-    @Mapping(target = "recursoReservados", ignore = true)
+    @Mapping(target = "idRecurso", source = "idRecurso")
+    @Mapping(target = "nombre", source = "nombre")
+    @Mapping(target = "tipoRecurso", source = "tipo")
+    @Mapping(target = "unidades", source = "unidades")
+    @Mapping(target = "descripcion", source = "descripcion")
+    @Mapping(target = "precio", source = "precio")
     List<RecursoDto> toRecursoDtos(List<Recurso> recursos);
 
     /**
@@ -42,6 +52,12 @@ public interface RecursoMapper {
      * - idRecurso: Generado automáticamente con @GeneratedValue
      * - recursoReservados: Se asignan manualmente en la lógica de negocio
      */
+
+    @Mapping(target = "nombre", source = "nombre")
+    @Mapping(target = "tipo", source = "tipoRecurso")
+    @Mapping(target = "unidades", source = "unidades")
+    @Mapping(target = "descripcion", source = "descripcion")
+    @Mapping(target = "precio", source = "precio")
     @Mapping(target = "idRecurso", ignore = true)
     @Mapping(target = "recursoReservados", ignore = true)
     Recurso toRecurso(RecursoDto recursoDto);
@@ -56,6 +72,12 @@ public interface RecursoMapper {
      * ESTRATEGIA NULL_VALUE_PROPERTY_MAPPING_STRATEGY.IGNORE:
      * - Si un campo en RecursoDTO es null, no se sobrescribe en la entidad
      */
+
+    @Mapping(target = "nombre", source = "nombre")
+    @Mapping(target = "tipo", source = "tipoRecurso")
+    @Mapping(target = "unidades", source = "unidades")
+    @Mapping(target = "descripcion", source = "descripcion")
+    @Mapping(target = "precio", source = "precio")
     @Mapping(target = "idRecurso", ignore = true)            // No editable
     @Mapping(target = "recursoReservados", ignore = true)    // Relación manejada aparte
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

@@ -26,13 +26,27 @@ public interface UsuarioMapper {
      * - reservas: No los incluimos en el DTO para evitar referencia circular
      * - reportes: No los incluimos en el DTO para evitar referencia circular
      */
-    @Mapping(target = "reservas", ignore = true)
-    @Mapping(target = "reportes",  ignore = true)
+    @Mapping(target  = "cedula", source = "cedula")
+    @Mapping(target = "nombre", source = "nombre" )
+    @Mapping(target = "apellido", source = "apellido")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "rol", source = "rol")
+    @Mapping(target = "contraseña", source = "contraseña")
+    @Mapping(target = "fechaRegistro", source = "fechaRegistro")
+    @Mapping(target = "telefono", source = "telefono")
     UsuarioDto toUsuarioDto(Usuario usuario);
 
     /**
-     * Convierte lista de SellerEntity a lista de SellerDTO
+     * Convierte lista de Usuarios a lista de usuarioDTO
      */
+    @Mapping(target  = "cedula", source = "cedula")
+    @Mapping(target = "nombre", source = "nombre" )
+    @Mapping(target = "apellido", source = "apellido")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "rol", source = "rol")
+    @Mapping(target = "contraseña", source = "contraseña")
+    @Mapping(target = "fechaRegistro", source = "fechaRegistro")
+    @Mapping(target = "telefono", source = "telefono")
     List<UsuarioDto> toUsuarioDtos(List<Usuario> usuarios);
 
     /**
@@ -45,8 +59,17 @@ public interface UsuarioMapper {
      * MAPEO AUTOMÁTICO:
      * - name, email, phone, address se mapean automáticamente
      */
+
+    @Mapping(target  = "cedula", source = "cedula")
+    @Mapping(target = "nombre", source = "nombre" )
+    @Mapping(target = "apellido", source = "apellido")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "rol", source = "rol")
+    @Mapping(target = "contraseña", source = "contraseña")
+    @Mapping(target = "fechaRegistro", source = "fechaRegistro")
+    @Mapping(target = "telefono", source = "telefono")
     @Mapping(target = "reservas", ignore = true)
-    @Mapping(target = "reportes",  ignore = true)
+    @Mapping(target = "reportes", ignore = true)
     Usuario toUsuario(UsuarioDto usuarioDto);
 
     /**
@@ -63,7 +86,13 @@ public interface UsuarioMapper {
     @Mapping(target = "cedula", ignore = true) // No puede edtiar su cedula
     @Mapping(target = "email", ignore = true)  // No puede edtiar su email
     @Mapping(target = "reservas", ignore = true)
-    @Mapping(target = "reportes",  ignore = true)
+    @Mapping(target = "reportes", ignore = true)
+    @Mapping(target = "nombre", source = "nombre")
+    @Mapping(target = "apellido", source = "apellido")
+    @Mapping(target = "rol", source = "rol")
+    @Mapping(target = "contraseña", source = "contraseña")
+    @Mapping(target = "telefono", source = "telefono")
+    @Mapping(target = "", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateUsuario(UsuarioDto usuarioDto, @MappingTarget Usuario usuario);
 

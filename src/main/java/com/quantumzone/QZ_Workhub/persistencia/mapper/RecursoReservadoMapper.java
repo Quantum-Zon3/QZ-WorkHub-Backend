@@ -26,15 +26,25 @@ public interface RecursoReservadoMapper {
      * - recurso y reserva: Se ignoran para evitar referencia circular
      *   (opcional: puedes exponer solo idRecurso y idReserva en el DTO)
      */
-    @Mapping(target = "recurso", ignore = true)
-    @Mapping(target = "reserva", ignore = true)
+    @Mapping(target = "idReserva", source = "reserva")
+    @Mapping(target = "idRecursoReservado", source = "recurso")
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "cantidad", source = "cantidad")
+    @Mapping(target = "fechaInicio", source = "recurso")
+    @Mapping(target = "fechaFin", source = "recurso")
+    @Mapping(target = "montoTotal", source = "recurso")
     RecursoReservadoDto toRecursoReservadoDto(RecursoReservado recursoReservado);
 
     /**
      * Convierte lista de RecursoReservado a lista de RecursoReservadoDTO
      */
-    @Mapping(target = "recurso", ignore = true)
-    @Mapping(target = "reserva", ignore = true)
+    @Mapping(target = "idReserva", source = "reserva")
+    @Mapping(target = "idRecursoReservado", source = "recurso")
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "cantidad", source = "cantidad")
+    @Mapping(target = "fechaInicio", source = "recurso")
+    @Mapping(target = "fechaFin", source = "recurso")
+    @Mapping(target = "montoTotal", source = "recurso")
     List<RecursoReservadoDto> toRecursoReservadoDtos(List<RecursoReservado> recursoReservados);
 
     /**
@@ -45,8 +55,12 @@ public interface RecursoReservadoMapper {
      * - recurso y reserva: Se asignan manualmente en la lógica de negocio
      */
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "recurso", ignore = true)
-    @Mapping(target = "reserva", ignore = true)
+    @Mapping(target = "recurso", source = "idRecursoReservado")
+    @Mapping(target = "reserva", source = "idReserva")
+    @Mapping(target = "cantidad", source = "cantidad")
+    @Mapping(target = "fechaInicio", source = "fechaInicio")
+    @Mapping(target = "fechaFin", source = "fechaFin")
+    @Mapping(target = "montoTotal", source = "montoTotal")
     RecursoReservado toRecursoReservado(RecursoReservadoDto recursoReservadoDto);
 
     /**
@@ -58,6 +72,10 @@ public interface RecursoReservadoMapper {
     @Mapping(target = "id", ignore = true)        // No editable
     @Mapping(target = "recurso", ignore = true)   // Relación manejada en el servicio
     @Mapping(target = "reserva", ignore = true)   // Relación manejada en el servicio
+    @Mapping(target = "cantidad", source = "cantidad")
+    @Mapping(target = "fechaInicio", source = "fechaInicio")
+    @Mapping(target = "fechaFin", source = "fechaFin")
+    @Mapping(target = "montoTotal", source = "montoTotal")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateRecursoReservado(RecursoReservadoDto recursoReservadoDto, @MappingTarget RecursoReservado recursoReservado);
 }
