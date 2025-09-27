@@ -58,7 +58,7 @@ public interface NotificacionMapper {
     @Mapping(target = "fecha", source = "fecha")
     @Mapping(target = "descripcion", source = "descripcion")
     @Mapping(target = "idNotificacion", ignore = true)
-    @Mapping(target = "reserva", source = "id_reserva", qualifiedByName = "crearReservaPorId")
+    @Mapping(target = "reserva", source = "idReserva", qualifiedByName = "createReservaFromId")
     Notificacion toNotificacion(NotificacionDto notificacionDto);
 
     /**
