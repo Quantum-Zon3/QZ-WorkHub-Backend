@@ -31,4 +31,7 @@ public class ReservaDto {
 
     @Schema(description = "ID de la sala que se va a utilizar", example = "1", required = true)
     private Long idSala;
+
+    @Schema(description = "Pago efectuado", example = "1000", required = true)
+    private Long idPago;
 }
