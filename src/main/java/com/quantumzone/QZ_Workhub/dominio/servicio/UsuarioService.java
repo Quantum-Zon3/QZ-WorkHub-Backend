@@ -13,17 +13,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 /**
- * Implementación del servicio de vendedores
+ * Implementación del servicio de usuarios
  *
  * ANOTACIONES:
  * @Service - Marca como componente de servicio de Spring
  * @Transactional - Manejo automático de transacciones
- * @RequiredArgsConstructor - Lombok genera constructor con dependencias final
  * @Slf4j - Lombok genera logger automáticamente
  *
  * PRINCIPIOS APLICADOS:
- * - Inversión de Dependencias: Depende de SellerDAO (abstracción)
- * - Single Responsibility: Solo lógica de negocio de vendedores
+ * - Inversión de Dependencias: Depende de usuarioDAo (abstracción)
+ * - Single Responsibility: Solo lógica de negocio de usuarios
  * - Fail Fast: Validaciones tempranas y excepciones claras
  */
 @Service
@@ -69,12 +68,12 @@ public class UsuarioService {
      */
     @Transactional(readOnly = true)
     public UsuarioDto findById(Long cedula) {
-        log.debug("Buscando vendedor por ID: {}", cedula);
+        log.debug("Buscando usuario por ID: {}", cedula);
 
         return usuarioDAO.findById(cedula)
                 .orElseThrow(() -> {
-                    log.warn("Vendedor no encontrado con ID: {}", cedula);
-                    return new RuntimeException("Vendedor no encontrado con ID: " + cedula);
+                    log.warn("usuario no encontrado con ID: {}", cedula);
+                    return new RuntimeException("usuario no encontrado con ID: " + cedula);
                 });
     }
 
@@ -83,7 +82,7 @@ public class UsuarioService {
      */
     @Transactional(readOnly = true)
     public List<UsuarioDto> findAll() {
-        log.debug("Obteniendo todos los vendedores");
+        log.debug("Obteniendo todos los usuario");
         return usuarioDAO.findAll();
     }
 
@@ -93,7 +92,7 @@ public class UsuarioService {
     public void deleteUsuario(Long cedula) {
         log.info("Eliminando usuarios ID: {}", cedula);
 
-        // Verificar que el vendedor existe
+        // Verificar que el usuarios existe
         UsuarioDto seller = findById(cedula);
         /*
         Regla de negocio: No eliminar si tiene productos
@@ -107,10 +106,10 @@ public class UsuarioService {
         // Eliminar vendedor
         boolean deleted = usuarioDAO.delete(cedula);
         if (!deleted) {
-            throw new RuntimeException("Error al eliminar usaurio con ID: " + cedula);
+            throw new RuntimeException("Error al eliminar usuarios con ID: " + cedula);
         }
 
-        log.info("usaurio eliminado exitosamente ID: {}", cedula);
+        log.info("usuarios eliminado exitosamente ID: {}", cedula);
     }
     /**
      * Actualizar usuario con validaciones
@@ -120,8 +119,8 @@ public class UsuarioService {
 
         // Verificar que el usaurio existe
         if (!usuarioDAO.findById(cedula).isPresent()) {
-            log.warn("Intento de actualizar usaurio inexistente ID: {}", cedula);
-            throw new RuntimeException("usaurio no encontrado con ID: " + cedula);
+            log.warn("Intento de actualizar usuarios inexistente ID: {}", cedula);
+            throw new RuntimeException("usuarios no encontrado con ID: " + cedula);
         }
 
         // Validaciones de negocio

@@ -1,20 +1,39 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
 
-import com.quantumzone.QZ_Workhub.persistencia.entidad.RecursoReservado;
+import com.quantumzone.QZ_Workhub.dominio.dto.RecursoReservadoDto;
+import com.quantumzone.QZ_Workhub.persistencia.dao.RecursoReservadoDAO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.quantumzone.QZ_Workhub.persistencia.repositorio.RecursoReservadoRepository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
+/**
+ * Implementación del servicio de recurso reservado
+ *
+ * ANOTACIONES:
+ * @Service - Marca como componente de servicio de Spring
+ * @Transactional - Manejo automático de transacciones
+ * @Slf4j - Lombok genera logger automáticamente
+ *
+ * PRINCIPIOS APLICADOS:
+ * - Inversión de Dependencias: Depende de SellerDAO (abstracción)
+ * - Single Responsibility: Solo lógica de negocio de vendedores
+ * - Fail Fast: Validaciones tempranas y excepciones claras
+ */
 
 @Service
+@Transactional
+@Slf4j
 public class RecursoReservadoService {
 
-    private final RecursoReservadoRepository recursoReservadoRepository;
+    private final RecursoReservadoDAO recursoRDao;
 
     @Autowired
-    public RecursoReservadoService(RecursoReservadoRepository recursoReservadoRepository) {
-        this.recursoReservadoRepository = recursoReservadoRepository;
+    public RecursoReservadoService(RecursoReservadoDAO recursoRDao) {
+        this.recursoRDao = recursoRDao;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -23,34 +42,105 @@ public class RecursoReservadoService {
         // Aquí puedes cargar datos iniciales de prueba si deseas
     }
 
-    // Guardar un recurso reservado
-    public RecursoReservado save(RecursoReservado recursoReservado) {
-        return recursoReservadoRepository.save(recursoReservado);
+    // Guardar un recurso
+    public RecursoReservadoDto save(RecursoReservadoDto recursoRDto) {
+        log.info("Creando nuevo recurso reservado con id: {}", recursoRDto.getIdRecursoReservado());
+        //Validaciones de negocio
+        validarRecursoR(recursoRDto);
+
+        //Creacion del recurso reservado
+        RecursoReservadoDto recursoRCreado = recursoRDao.save(recursoRDto);
+        log.info("Recurso reservado creado: {}", recursoRCreado.getIdRecursoReservado());
+        return recursoRCreado;
     }
 
     // Encontrar un recurso reservado por id
-    public Optional<RecursoReservado> findById(Long id) {
-        return recursoReservadoRepository.findById(id);
+    public RecursoReservadoDto findById(Long id) {
+        log.info("Buscando recurso reservado con id: {}", id);
+
+        return recursoRDao.findById(id).orElseThrow(() -> {
+            log.warn("recurso reservado no encontrada con ID: {}", id);
+            return new RuntimeException("recurso reservado no encontrada con ID: " + id);
+        });
     }
 
-    // Listar todos los recursos reservados
-    public List<RecursoReservado> findAll() {
-        return recursoReservadoRepository.findAll();
+    // Listar todos los recursos
+    @Transactional(readOnly = true)
+    public List<RecursoReservadoDto> findAll() {
+        log.debug("Obteniendo todos los recursos reservado: {}", recursoRDao.findAll().size());
+        return recursoRDao.findAll();
     }
 
     // Eliminar un recurso reservado por id
-    public void deleteById(Long id) {recursoReservadoRepository.deleteById(id);
+    public void delete(Long id) {
+        log.info("Eliminando recurso reservado ID: {}", id);
+
+        // Verificar que el recurso reservado existe
+        findById(id);
+
+        // Eliminar recurso reservado
+        boolean deleted = recursoRDao.delete(id);
+        if (!deleted) {
+            throw new RuntimeException("Error al eliminar recurso reservado con ID: " + id);
+        }
+
+        log.info("Recurso reservado eliminado exitosamente ID: {}", id);
     }
 
-    // Actualizar un recurso reservado
-    public RecursoReservado update(RecursoReservado recursoReservado) {
-        return recursoReservadoRepository.save(recursoReservado);
+    public RecursoReservadoDto update(Long id, RecursoReservadoDto recursoRDto) {
+        log.info("Actualizando recurso reservado ID: {}", id);
+
+        // Verificar que el recurso reservado existe
+        findById(id);
+
+        // Validar datos de actualización
+        validarRecursoR(recursoRDto);
+
+        // Actualizar
+        RecursoReservadoDto recursoRActualizado = recursoRDao.update(id, recursoRDto)
+                .orElseThrow(() -> new RuntimeException("Error al actualizar recurso reservado"));
+
+        log.info("recurso reservado actualizado exitosamente ID: {}", id);
+        return recursoRActualizado;
     }
-    /*
-    // Buscar recursos reservados por filtros (ejemplo: idUsuario o fecha)
-    public Optional<List<RecursoReservado>> findByFilters(String filtro) {
-        return recursoReservadoRepository.findByFilters(filtro);
+
+    private void validarRecursoR(RecursoReservadoDto recursoRDto) {
+
+        // Validar id de recurso
+        if (recursoRDto.getIdRecursoReservado() == null || recursoRDto.getIdRecursoReservado() == 0) {
+            throw new IllegalArgumentException("El id del recurso solicitado es obligatorio");
+        }
+
+        // Validar id de reserva
+        if (recursoRDto.getIdReserva() == null || recursoRDto.getIdReserva() == 0) {
+            throw new IllegalArgumentException("El id de la reserva es obligatio");
+        }
+
+        // Validar la cantidad
+        if (recursoRDto.getCantidad() == null || recursoRDto.getCantidad() == 0) {
+            throw new IllegalArgumentException("El cantidad es obligatorio");
+        }
+
+        // Validar fecha de inicio
+        if (recursoRDto.getFechaInicio() == null) {
+            throw new IllegalArgumentException("La fecha de inicio es obligatoria");
+        }
+        if (recursoRDto.getFechaInicio().isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("La fecha de inicio no puede ser en el futuro");
+        }
+
+        // Validar fecha de fin
+        if (recursoRDto.getFechaFin() == null) {
+            throw new IllegalArgumentException("La fecha de finalizacion es obligatoria");
+        }
+        if (recursoRDto.getFechaFin().isAfter(LocalDateTime.now())) {
+            throw new IllegalArgumentException("La fecha de finalizacion no puede ser en el futuro");
+        }
+
+        //Validar monto total
+        if(recursoRDto.getMontoTotal() == null || recursoRDto.getMontoTotal()<0) {
+            throw new IllegalArgumentException("La monto total es obligatorio y debe ser mayor a cero");
+        }
     }
-     */
 }
 

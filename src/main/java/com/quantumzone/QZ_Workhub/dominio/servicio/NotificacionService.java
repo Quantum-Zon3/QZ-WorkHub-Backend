@@ -36,9 +36,9 @@ public class NotificacionService{
         // Validar datos de la notificacion
         validarNotificacion(notificacionDto);
 
-        // Crear producto
+        // Crear notificacion
         NotificacionDto notificacionCreadda = notificacionDAO.save(notificacionDto);
-        log.info("Producto creado exitosamente con ID: {}", notificacionDto.getIdNotificacion());
+        log.info("notificacion creado exitosamente con ID: {}", notificacionDto.getIdNotificacion());
 
         return notificacionCreadda;
     }
@@ -47,7 +47,7 @@ public class NotificacionService{
      */
     @Transactional(readOnly = true)
     public NotificacionDto findById(Long id) {
-        log.debug("Buscando producto por ID: {}", id);
+        log.debug("Buscando notificacion por ID: {}", id);
 
         return notificacionDAO.findById(id)
                 .orElseThrow(() -> {
@@ -74,13 +74,13 @@ public class NotificacionService{
         // Verificar que el notificacion existe
         findById(id);
 
-        // Eliminar producto
+        // Eliminar notificacion
         boolean deleted = notificacionDAO.delete(id);
         if (!deleted) {
-            throw new RuntimeException("Error al eliminar producto con ID: " + id);
+            throw new RuntimeException("Error al eliminar notificacion con ID: " + id);
         }
 
-        log.info("Producto eliminado exitosamente ID: {}", id);
+        log.info("notificacion eliminado exitosamente ID: {}", id);
     }
 
     /**

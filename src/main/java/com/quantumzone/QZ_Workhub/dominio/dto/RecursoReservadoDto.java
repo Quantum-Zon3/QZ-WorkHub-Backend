@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -19,13 +20,13 @@ public class RecursoReservadoDto {
     private Long cantidad;
 
     @Schema(description = "Fecha en la que se utiliza el recurso", example = "26-09-2025")
-    private LocalDate fechaInicio;
+    private LocalDateTime fechaInicio;
 
     @Schema(description = "Fecha en la quer se dejo de utilizar el recurso", example = "26-09-2025")
-    private LocalDate fechaFin;
+    private LocalDateTime fechaFin;
 
     @Schema(description = "Monto total por la cantidad de recursos a utilizar de este tipo", example = "200000")
-    private int montoTotal;
+    private Integer montoTotal;
     
     @Schema(description = "ID del recurso solicitado", example = "1", required = true)
     private Long idRecursoReservado;
