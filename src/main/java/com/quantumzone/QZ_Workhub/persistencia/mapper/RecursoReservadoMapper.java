@@ -1,6 +1,8 @@
 package com.quantumzone.QZ_Workhub.persistencia.mapper;
 import com.quantumzone.QZ_Workhub.dominio.dto.RecursoReservadoDto;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Recurso;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.RecursoReservado;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Reserva;
 import org.mapstruct.*;
 import java.util.List;
 /**
@@ -26,25 +28,25 @@ public interface RecursoReservadoMapper {
      * - recurso y reserva: Se ignoran para evitar referencia circular
      *   (opcional: puedes exponer solo idRecurso y idReserva en el DTO)
      */
-    @Mapping(target = "idReserva", source = "reserva")
-    @Mapping(target = "idRecursoReservado", source = "recurso")
+    @Mapping(target = "idReserva", source = "reserva",qualifiedByName = "createIdFromReserva")
+    @Mapping(target = "idRecursoReservado", source = "recurso",qualifiedByName = "createIdFromRecurso")
     @Mapping(target = "id", source = "id")
     @Mapping(target = "cantidad", source = "cantidad")
-    @Mapping(target = "fechaInicio", source = "recurso")
-    @Mapping(target = "fechaFin", source = "recurso")
-    @Mapping(target = "montoTotal", source = "recurso")
+    @Mapping(target = "fechaInicio", source = "fechaInicio")
+    @Mapping(target = "fechaFin", source = "fechaFin")
+    @Mapping(target = "montoTotal", source = "montoTotal")
     RecursoReservadoDto toRecursoReservadoDto(RecursoReservado recursoReservado);
 
     /**
      * Convierte lista de RecursoReservado a lista de RecursoReservadoDTO
      */
-    @Mapping(target = "idReserva", source = "reserva")
-    @Mapping(target = "idRecursoReservado", source = "recurso")
+    @Mapping(target = "idReserva", source = "reserva", qualifiedByName = "createIdFromReserva")
+    @Mapping(target = "idRecursoReservado", source = "recurso",qualifiedByName = "createIdFromRecurso")
     @Mapping(target = "id", source = "id")
     @Mapping(target = "cantidad", source = "cantidad")
-    @Mapping(target = "fechaInicio", source = "recurso")
-    @Mapping(target = "fechaFin", source = "recurso")
-    @Mapping(target = "montoTotal", source = "recurso")
+    @Mapping(target = "fechaInicio", source = "fechaInicio")
+    @Mapping(target = "fechaFin", source = "fechaFin")
+    @Mapping(target = "montoTotal", source = "montoTotal")
     List<RecursoReservadoDto> toRecursoReservadoDtos(List<RecursoReservado> recursoReservados);
 
     /**
@@ -55,8 +57,8 @@ public interface RecursoReservadoMapper {
      * - recurso y reserva: Se asignan manualmente en la lógica de negocio
      */
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "recurso", source = "idRecursoReservado")
-    @Mapping(target = "reserva", source = "idReserva")
+    @Mapping(target = "recurso", source = "idRecursoReservado", qualifiedByName = "createRecursoFromId")
+    @Mapping(target = "reserva", source = "idReserva", qualifiedByName = "createReservaFromId")
     @Mapping(target = "cantidad", source = "cantidad")
     @Mapping(target = "fechaInicio", source = "fechaInicio")
     @Mapping(target = "fechaFin", source = "fechaFin")
@@ -78,5 +80,64 @@ public interface RecursoReservadoMapper {
     @Mapping(target = "montoTotal", source = "montoTotal")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateRecursoReservado(RecursoReservadoDto recursoReservadoDto, @MappingTarget RecursoReservado recursoReservado);
+
+    /**
+     * METODO AUXILIAR: Crea reserva con solo el ID
+     *
+     *
+     * @Named: Permite referenciar este metodo en otros mapeos
+     */
+    @Named("createReservaFromId")
+    default Reserva createReservaFromId(Long idReserva) {
+        if (idReserva == null) {
+            return null;
+        }
+        Reserva reserva = new Reserva();
+        reserva.setIdReserva(idReserva);
+        return reserva;
+    }
+    /**
+     * METODO AUXILIAR: obtener la id de la reserva
+     *
+     *
+     * @Named: Permite referenciar este metodo en otros mapeos
+     */
+    @Named("createIdFromReserva")
+    default Long createIdFromReserva(Reserva reserva) {
+        if (reserva == null) {
+            return null;
+        }
+        return reserva.getIdReserva();
+    }
+    /**
+     * METODO AUXILIAR: Crea reserva con solo el ID
+     *
+     *
+     * @Named: Permite referenciar este metodo en otros mapeos
+     */
+    @Named("createRecursoFromId")
+    default Recurso createRecursoFromId(Long idRecurso) {
+        if (idRecurso == null) {
+            return null;
+        }
+        Recurso recurso = new Recurso();
+        recurso.setIdRecurso(idRecurso);
+        return recurso;
+    }
+    /**
+     * METODO AUXILIAR: obtener la id de la reserva
+     *
+     *
+     * @Named: Permite referenciar este metodo en otros mapeos
+     */
+
+    @Named("createIdFromRecurso")
+    default Long createIdFromRecurso(Recurso recurso) {
+        if (recurso == null) {
+            return null;
+        }
+        return recurso.getIdRecurso();
+    }
+
 }
 

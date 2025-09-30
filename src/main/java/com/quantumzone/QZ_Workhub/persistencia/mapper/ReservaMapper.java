@@ -36,7 +36,7 @@ public interface ReservaMapper {
     @Mapping(target = "cantidadVisitantes", source = "cantidadVisitantes")
     @Mapping(target = "cedula", source = "usuario",qualifiedByName = "createIdFromUsuario")
     @Mapping(target = "idSala", source = "sala",qualifiedByName = "createIdFromSala")
-    @Mapping(target = "id_pago", source = "pago",qualifiedByName = "createIdFromPago")
+    @Mapping(target = "idPago", source = "pago",qualifiedByName = "createIdFromPago")
     ReservaDto toReservaDto(Reserva reserva);
 
     /**
@@ -49,7 +49,7 @@ public interface ReservaMapper {
     @Mapping(target = "cantidadVisitantes", source = "cantidadVisitantes")
     @Mapping(target = "cedula", source = "usuario" ,qualifiedByName = "createIdFromUsuario")
     @Mapping(target = "idSala", source = "sala" ,qualifiedByName = "createIdFromSala")
-    @Mapping(target = "id_pago", source = "pago",qualifiedByName = "createIdFromPago")
+    @Mapping(target = "idPago", source = "pago",qualifiedByName = "createIdFromPago")
     List<ReservaDto> toReservaDtos(List<Reserva> reservas);
 
     /**
@@ -65,8 +65,8 @@ public interface ReservaMapper {
     @Mapping(target = "montoTotal", source = "montoTotal")
     @Mapping(target = "cantidadVisitantes", source = "cantidadVisitantes")
     @Mapping(target = "usuario", source = "cedula",qualifiedByName = "createUsuarioFromId")
-    @Mapping(target = "sala", source = "idSala", qualifiedByName = "createUsuarioFromId")
-    @Mapping(target = "pago", source = "id_pago", qualifiedByName = "createPagoFromId")
+    @Mapping(target = "sala", source = "idSala", qualifiedByName = "createSalaFromId")
+    @Mapping(target = "pago", source = "idPago", qualifiedByName = "createPagoFromId")
     @Mapping(target = "idReserva", ignore = true)
     @Mapping(target = "notificaciones", ignore = true)
     @Mapping(target = "reportes", ignore = true)

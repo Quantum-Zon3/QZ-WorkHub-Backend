@@ -92,7 +92,6 @@ public interface UsuarioMapper {
     @Mapping(target = "rol", source = "rol")
     @Mapping(target = "contraseña", source = "contraseña")
     @Mapping(target = "telefono", source = "telefono")
-    @Mapping(target = "", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateUsuario(UsuarioDto usuarioDto, @MappingTarget Usuario usuario);
 
