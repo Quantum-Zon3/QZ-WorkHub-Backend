@@ -1,19 +1,41 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.Reserva;
+import java.time.LocalDateTime;
+
+import com.quantumzone.QZ_Workhub.dominio.dto.ReservaDto;
+import com.quantumzone.QZ_Workhub.persistencia.dao.ReservaDAO;
+
+import org.springframework.transaction.annotation.Transactional;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.quantumzone.QZ_Workhub.persistencia.repositorio.ReservaRepository;
-import java.util.List;
-import java.util.Optional;
 
+import java.util.List;
+/**
+ * Implementación del servicio de reservas
+ *
+ * ANOTACIONES:
+ * @Service - Marca como componente de servicio de Spring
+ * @Transactional - Manejo automático de transacciones
+ * @RequiredArgsConstructor - Lombok genera constructor con dependencias final
+ * @Slf4j - Lombok genera logger automáticamente
+ *
+ * PRINCIPIOS APLICADOS:
+ * - Inversión de Dependencias: Depende de reservaDAO (abstracción)
+ * - Single Responsibility: Solo lógica de negocio de reservas
+ * - Fail Fast: Validaciones tempranas y excepciones claras
+ */
 @Service
+@Transactional
+@Slf4j
 public class ReservaService {
 
-    private final ReservaRepository reservaRepository;
+    private final ReservaDAO reservaDAO;
 
     @Autowired
-    public ReservaService(ReservaRepository reservaRepository) {
-        this.reservaRepository = reservaRepository;
+    public ReservaService(ReservaDAO reservaDAO) {
+        this.reservaDAO = reservaDAO;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -23,32 +45,128 @@ public class ReservaService {
     }
 
     // Guardar una reserva
-    public Reserva save(Reserva reserva) {
-        return reservaRepository.save(reserva);
+    public ReservaDto save(ReservaDto reservaDto) {
+
+        log.info("Iniciando sala reserva: {}", reservaDto.getIdReserva());
+        if (reservaDAO.findById(reservaDto.getIdReserva()).isPresent()) {
+            log.warn("Reserva ya existente");
+            throw new IllegalArgumentException("Reserva ya existente");
+        }
+        validarReserva(reservaDto);
+
+        ReservaDto reservaCreada = reservaDAO.save(reservaDto);
+        log.info("Sala reservada: {}", reservaCreada.getIdReserva());
+        return reservaCreada;
     }
 
-    // Encontrar una reserva por id
-    public Optional<Reserva> findById(Long id) {
-        return reservaRepository.findById(id);
+    /**
+     * Buscar reserva por ID con manejo de errores
+     */
+    @Transactional(readOnly = true)
+    public ReservaDto findById(Long idReserva) {
+        log.debug("Buscando reserva por id: {}", idReserva);
+
+        return reservaDAO.findById(idReserva)
+                .orElseThrow(() -> {
+                    log.warn("Reserva nao encontrada: {}", idReserva);
+                    return new RuntimeException("No se encontro la reserva por id: " + idReserva);
+                });
     }
 
-    // Listar todas las reservas
-    public List<Reserva> findAll() {
-        return reservaRepository.findAll();
+    /**
+     * Obtener todas las salas
+     */
+    @Transactional(readOnly = true)
+    public List<ReservaDto> findAll() {
+        log.debug("Buscando reservas");
+        return reservaDAO.findAll();
     }
 
-    // Eliminar una reserva por id
-    public void deleteById(Long id) {reservaRepository.deleteById(id);
+    /**
+     * Eliminar reservas con validaciones de negocio
+     */
+    public void deleteReserva(Long id) {
+        log.info("Buscando reserva por id: {}", id);
+
+        //verificar que la reserva si exista
+        ReservaDto reservaBuscada = findById(id);
+        //Eliminar reserva
+        boolean eliminar = reservaDAO.delete(id);
+        if (!eliminar) {
+            throw new RuntimeException("No se logro eliminar la reserva co el ID: " + id);
+        }
+
+        log.info("Sala reservada: {}", reservaBuscada.getIdReserva() + "eliminada exitosamente");
     }
 
-    // Actualizar una reserva
-    public Reserva update(Reserva reserva) {
-        return reservaRepository.save(reserva);
+    /**
+     * Actualizar reservq con validaciones
+     */
+    public ReservaDto update(Long id, ReservaDto reservaDto) {
+        log.warn("Buscando reserva por id: {}", id);
+
+        //verificamos si la reserva existe
+        if (!reservaDAO.findById(id).isPresent()) {
+            log.warn("Reserva no encontrada con el ID: {}", id);
+            throw new IllegalArgumentException("Reserva no encontrada con el ID: " + id);
+        }
+
+        //validaciones de negocio
+        validarReserva(reservaDto);
+
+        // Actualizar
+        ReservaDto reservaActualizada = reservaDAO.update(id, reservaDto)
+                .orElseThrow(() -> new RuntimeException("Error al actualizar la reserva con el ID: " + id));
+        log.info("Reserva actualizada: {}",  reservaActualizada.getIdReserva() + "exitosamente");
+        return reservaActualizada;
     }
 
-    // Buscar reservas por filtros )
-    public Optional<List<Reserva>> findByCantidadVisitantes(Integer filtro) {
-        return reservaRepository.findByCantidadVisitantes(filtro);
-    }
+    /**
+     * Validar los datos para crear y/o actualizar la reserva
+     */
+    private void validarReserva(ReservaDto reservaDto) {
+    //validar ID
+        if (reservaDto.getIdReserva() == null || reservaDto.getIdReserva() <= 0) {
+            throw new IllegalArgumentException("La id es obligatoria y no puede ser negativa");
+        }
+
+        //validar fecha de inicio
+        if (reservaDto.getFechaInicio() == null) {
+            throw new IllegalArgumentException("La fecha de inicio es obligatoria");
+        }
+        if (reservaDto.getFechaInicio().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("La fecha de inicio no puede ser en el pasado.");
+        }
+
+        //validar fecha de fin
+        if (reservaDto.getFechaFin() == null) {
+            throw new IllegalArgumentException("La fecha de fin es obligatoria");
+        }
+        if (reservaDto.getFechaFin().isBefore(reservaDto.getFechaInicio())) {
+            throw new IllegalArgumentException("La fecha de fin no puede ser anterior a la fecha de inicio");
+        }
+
+        //validar monto total
+        if (reservaDto.getMontoTotal() == null || reservaDto.getMontoTotal() <= 0) {
+            throw new IllegalArgumentException("El monto total es obligatorio y no puede ser ni 0 ni negativo");
+        }
+
+        //validar cantidad de personas
+        if (reservaDto.getCantidadVisitantes() == null || reservaDto.getCantidadVisitantes() <= 0) {
+            throw new IllegalArgumentException("La cantidad de visitantes es obligatoria y no puede ser ni 0 ni negativa");
+        }
+        //validar cedula
+        if (reservaDto.getCedula() == null || reservaDto.getCedula() <= 0) {
+            throw new IllegalArgumentException("La cédula es obligatoria");
+        }
+        //validar id sala
+        if (reservaDto.getIdSala() == null || reservaDto.getIdSala() <= 0) {
+            throw new IllegalArgumentException("El ID de la sala es obligatorio");
+        }
+        //validar id pago
+        if (reservaDto.getIdPago() == null || reservaDto.getIdPago() <= 0) {
+            throw new IllegalArgumentException("El ID del pago es obligatorio");
+        }
+    }    
 }
 
