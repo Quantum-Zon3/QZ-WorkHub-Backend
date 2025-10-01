@@ -1,8 +1,6 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
-import com.quantumzone.QZ_Workhub.dominio.dto.RecursoDto;
 import com.quantumzone.QZ_Workhub.dominio.dto.RecursoReservadoDto;
 import com.quantumzone.QZ_Workhub.dominio.servicio.RecursoReservadoService;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.RecursoReservado;
 //imports de anotacion springboot
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 //imports para documentar swagen
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +20,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
+
 @RestController
 @RequestMapping("/qzwork_hub/recursosReservados")
 @Tag(name = "RecursoReservado", description = "Controlador de recursos reservados")

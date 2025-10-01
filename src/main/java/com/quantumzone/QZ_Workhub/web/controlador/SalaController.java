@@ -1,7 +1,7 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
 //imports de anotacion springboot
+import com.quantumzone.QZ_Workhub.dominio.dto.SalaDto;
 import com.quantumzone.QZ_Workhub.dominio.servicio.SalaService;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.Sala;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 //imports para documentar swagen
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,9 +20,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import java.time.LocalDate;
 import java.util.List;
+
 @RestController
 @RequestMapping("/qzwork_hub/salas")
 @Tag(name = "Sala", description = "Controlador de salas")
@@ -40,7 +38,7 @@ public class SalaController {
             @ApiResponse(responseCode = "200", description = "Lista de salas obtenida con éxito"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<List<Sala>> getAllSalas() {
+    public ResponseEntity<List<SalaDto>> getAllSalas() {
         return new ResponseEntity<>(salaService.findAll(), HttpStatus.OK);
     }
 
@@ -50,11 +48,14 @@ public class SalaController {
             @ApiResponse(responseCode = "200", description = "Sala encontrada"),
             @ApiResponse(responseCode = "404", description = "Sala no encontrada")
     })
-    public ResponseEntity<Sala> getSalaById(
+    public ResponseEntity<SalaDto> getSalaById(
             @PathVariable @Parameter(description = "ID de la sala") Long id) {
-        return salaService.findById(id)
-                .map(sala -> new ResponseEntity<>(sala, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        try{
+            SalaDto sala = salaService.findById(id);
+            return ResponseEntity.ok(sala);
+        }catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
@@ -63,9 +64,9 @@ public class SalaController {
             @ApiResponse(responseCode = "201", description = "Sala creada con éxito"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
-    public ResponseEntity<Sala> createSala(
-            @RequestBody @Parameter(description = "Datos de la sala a crear") Sala sala) {
-        Sala nuevaSala = salaService.save(sala);
+    public ResponseEntity<SalaDto> createSala(
+            @RequestBody @Parameter(description = "Datos de la sala a crear") SalaDto sala) {
+        SalaDto nuevaSala = salaService.save(sala);
         return new ResponseEntity<>(nuevaSala, HttpStatus.CREATED);
     }
 
@@ -75,10 +76,10 @@ public class SalaController {
             @ApiResponse(responseCode = "200", description = "Sala actualizada con éxito"),
             @ApiResponse(responseCode = "404", description = "Sala no encontrada")
     })
-    public ResponseEntity<Sala> updateSala(
+    public ResponseEntity<SalaDto> updateSala(
             @PathVariable @Parameter(description = "ID de la sala") Long id,
-            @RequestBody @Parameter(description = "Datos actualizados de la sala") Sala sala) {
-        Sala salaActualizada = salaService.update(sala);
+            @RequestBody @Parameter(description = "Datos actualizados de la sala") SalaDto sala) {
+        SalaDto salaActualizada = salaService.update(id, sala);
          return new ResponseEntity<>(salaActualizada, HttpStatus.OK);
     }
 
@@ -91,13 +92,13 @@ public class SalaController {
     public ResponseEntity<Void> deleteSala(
             @PathVariable @Parameter(description = "ID de la sala") Long id) {
         try {
-            salaService.deleteById(id);
+            salaService.deleteSala(id);
             return ResponseEntity.noContent().build();
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.notFound().build();
         }
     }
-
+    /*
     @GetMapping("/buscar")
     @Operation(summary = "Buscar salas por filtros", description = "Busca salas por nombre, capacidad o ubicación.")
     @ApiResponses(value = {
@@ -110,5 +111,5 @@ public class SalaController {
         return salaService.findByNombre(nombre)
                 .map(salas -> new ResponseEntity<>(salas, HttpStatus.OK))
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
+    }*/
 }
