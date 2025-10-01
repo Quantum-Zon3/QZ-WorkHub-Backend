@@ -1,5 +1,7 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
 //imports de anotacion springboot
+import com.quantumzone.QZ_Workhub.dominio.dto.RecursoDto;
+import com.quantumzone.QZ_Workhub.dominio.dto.UsuarioDto;
 import com.quantumzone.QZ_Workhub.dominio.enums.TipoRecurso;
 import com.quantumzone.QZ_Workhub.dominio.servicio.RecursoService;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Recurso;
@@ -44,7 +46,7 @@ public class RecursoController {
                 @ApiResponse(responseCode = "200", description = "Lista de recursos obtenida con éxito"),
                 @ApiResponse(responseCode = "500", description = "Error interno del servidor")
         })
-        public ResponseEntity<List<Recurso>> getAllRecursos() {
+        public ResponseEntity<List<RecursoDto>> getAllRecursos() {
             return new ResponseEntity<>(recursoService.findAll(), HttpStatus.OK);
         }
 
@@ -54,10 +56,13 @@ public class RecursoController {
                 @ApiResponse(responseCode = "200", description = "Recurso encontrado"),
                 @ApiResponse(responseCode = "404", description = "Recurso no encontrado")
         })
-        public ResponseEntity<Recurso> getRecursoById(@PathVariable @Parameter(description = "ID del recurso") Long id) {
-            return recursoService.findById(id)
-                    .map(recurso -> new ResponseEntity<>(recurso, HttpStatus.OK))
-                    .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        public ResponseEntity<RecursoDto> getRecursoById(@PathVariable @Parameter(description = "ID del recurso") Long id) {
+            try {
+                RecursoDto recursoDto = recursoService.findById(id);
+                return ResponseEntity.ok(recursoDto);
+            } catch (RuntimeException e) {
+                return ResponseEntity.notFound().build();
+            }
         }
 
         @PostMapping
@@ -66,8 +71,8 @@ public class RecursoController {
                 @ApiResponse(responseCode = "201", description = "Recurso creado con éxito"),
                 @ApiResponse(responseCode = "400", description = "Datos inválidos")
         })
-        public ResponseEntity<Recurso> createRecurso(@RequestBody @Parameter(description = "Datos del recurso a crear") Recurso recurso) {
-            Recurso nuevoRecurso = recursoService.save(recurso);
+        public ResponseEntity<RecursoDto> createRecurso(@RequestBody @Parameter(description = "Datos del recurso a crear") RecursoDto recurso) {
+            RecursoDto nuevoRecurso = recursoService.save(recurso);
             return new ResponseEntity<>(nuevoRecurso, HttpStatus.CREATED);
         }
 
@@ -77,10 +82,10 @@ public class RecursoController {
                 @ApiResponse(responseCode = "200", description = "Recurso actualizado con éxito"),
                 @ApiResponse(responseCode = "404", description = "Recurso no encontrado")
         })
-        public ResponseEntity<Recurso> updateRecurso(
+        public ResponseEntity<RecursoDto> updateRecurso(
                 @PathVariable @Parameter(description = "ID del recurso") Long id,
-                @RequestBody @Parameter(description = "Datos actualizados del recurso") Recurso recurso) {
-            Recurso recursoActualizado = recursoService.update(recurso);
+                @RequestBody @Parameter(description = "Datos actualizados del recurso") RecursoDto recurso) {
+            RecursoDto recursoActualizado = recursoService.update(id, recurso);
             return new ResponseEntity<>(recursoActualizado, HttpStatus.OK);
 
         }
@@ -93,7 +98,7 @@ public class RecursoController {
         })
         public ResponseEntity<Void> deleteRecurso(@PathVariable @Parameter(description = "ID del recurso") Long id) {
             try {
-                recursoService.deleteById(id);
+                recursoService.delete(id);
                 return ResponseEntity.noContent().build();
             } catch (EmptyResultDataAccessException e) {
                 return ResponseEntity.notFound().build();
@@ -106,11 +111,13 @@ public class RecursoController {
                 @ApiResponse(responseCode = "200", description = "Recursos encontrados"),
                 @ApiResponse(responseCode = "400", description = "Parámetros inválidos")
         })
-        public ResponseEntity<List<Recurso>> buscarRecursosPorTipo(
-                @RequestParam(required = false) @Parameter(description = "Tipo de recurso") TipoRecurso tipo)
-                 {
-            return recursoService.findByTipo(tipo)
-                    .map(recursos -> new ResponseEntity<>(recursos, HttpStatus.OK))
-                    .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        public ResponseEntity<List<RecursoDto>> buscarRecursosPorTipo(
+                @RequestParam(required = false) @Parameter(description = "Tipo de recurso") TipoRecurso tipo){
+                try {
+                    List<RecursoDto> recursos = recursoService.findByTipoRecurso(tipo);
+                    return ResponseEntity.ok(recursos);
+                } catch (RuntimeException e) {
+                    return ResponseEntity.notFound().build();
+                }
         }
 }
