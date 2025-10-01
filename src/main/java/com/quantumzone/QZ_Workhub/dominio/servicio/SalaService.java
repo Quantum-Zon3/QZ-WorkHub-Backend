@@ -1,15 +1,11 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
 import com.quantumzone.QZ_Workhub.dominio.dto.SalaDto;
 import com.quantumzone.QZ_Workhub.persistencia.dao.SalaDAO;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.Sala;
-
-import com.quantumzone.QZ_Workhub.persistencia.repositorio.SalaRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.Optional;
 /**
  * Implementación del servicio de salas
  *
@@ -20,7 +16,7 @@ import java.util.Optional;
  * @Slf4j - Lombok genera logger automáticamente
  *
  * PRINCIPIOS APLICADOS:
- * - Inversión de Dependencias: Depende de salaDAo (abstracción)
+ * - Inversión de Dependencias: Depende de salaDAO (abstracción)
  * - Single Responsibility: Solo lógica de negocio de salas
  * - Fail Fast: Validaciones tempranas y excepciones claras
  */
@@ -28,7 +24,6 @@ import java.util.Optional;
 @Transactional
 @Slf4j
 public class SalaService {
-
 
     private final SalaDAO  salaDAO;
 
@@ -57,10 +52,76 @@ public class SalaService {
         log.info("Sala con ID creada: {}", salaCreada.getIdSala());
         return salaCreada;
     }
+
+    /**
+     * Buscar sala por ID con manejo de errores
+     */
+    @Transactional(readOnly = true)
+    public SalaDto findById(Long id){
+        log.debug("Buscando sala con ID: {}", id);
+
+        return salaDAO.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("No se encontro la sala con ID: {}", id);
+                    return new RuntimeException("No se encontro la sala con ID: " + id);
+                });
+    }
+
+    /**
+     * Obtener todas las salas
+     */
+    @Transactional(readOnly = true)
+    public List<SalaDto> findAll(){
+        log.debug("Buscando salas");
+        return salaDAO.findAll();
+    }
+
+    /**
+     * Eliminar salas con validaciones de negocio
+     */
+    public void deleteSala(Long id){
+        log.info("Eliminando sala con ID: {}", id);
+
+        //verificar que la sala si existe
+        SalaDto salaBusacada = findById(id);
+         // Eliminar sala
+        boolean eliminar = salaDAO.delete(id);
+        if (!eliminar) {
+            throw new RuntimeException("No se logro eliminar la sala con ID: " + id);
+        }
+
+        log.info("Sala con ID: {}", salaBusacada.getIdSala() + "eliminado exitosamente");
+    }
+
+    /**
+     * Actualizar sala con validaciones
+     */
+    public SalaDto update(Long id, SalaDto salaDto) {
+        log.info("Actualizando sala con ID: {}", id);
+
+        //verificamos que la sala exista
+        if(!salaDAO.findById(id).isPresent()) {
+            log.warn("No se encontro la sala con ID: {}", id);
+            throw new IllegalArgumentException("No se encontro la sala con ID: " + id);
+        }
+
+        // validaciones de negocio
+        validarSala(salaDto);
+
+        // Actualizar
+        SalaDto salaActualizada = salaDAO.update(id, salaDto)
+                .orElseThrow(() -> new RuntimeException("Error al actualizar la sala con ID: " + id));
+        log.info("Sala actualizada: {}", salaActualizada);
+        return salaActualizada;
+    }
+
+    /**
+     * Validar los datos para crear y/o actualizar la sala
+     */
     private void validarSala(SalaDto salaDto) {
         //validar ID
         if(salaDto.getIdSala() == null || salaDto.getIdSala() <= 0) {
-            throw new IllegalArgumentException("La sala es obligatoria y no puede ser negativa");
+            throw new IllegalArgumentException("La id es obligatoria y no puede ser negativa");
         }
 
         //validar nombre
@@ -76,31 +137,18 @@ public class SalaService {
             throw new IllegalArgumentException("La sala debe tener alguna capacidad fija mayor a 0");
         }
 
+        //validar peso
+        if(salaDto.getPrecio() <= 0 || salaDto.getPrecio() == null) {
+            throw new IllegalArgumentException("El precio es obligatorio");
+        }
 
+        //validar descripcion
+        if(salaDto.getDescripcion() == null || salaDto.getDescripcion().trim().isEmpty()) {
+            throw new IllegalArgumentException("La descripcion es obligatorio");
+        }
+        if(salaDto.getDescripcion().length() < 45) {
+            throw new IllegalArgumentException("La descripcion no puede exceder los 45 caracteres");
+        }
     }
 
-    // Encontrar una sala por id
-    public Optional<Sala> findById(Long id) {
-        return salaRepository.findById(id);
-    }
-
-    // Listar todas las salas
-    public List<Sala> findAll() {
-        return salaRepository.findAll();
-    }
-
-    // Eliminar una sala por id
-    public void deleteById(Long id) {
-        salaRepository.deleteById(id);
-    }
-
-    // Actualizar una sala
-    public Sala update(Sala sala) {
-        return salaRepository.save(sala);
-    }
-
-    // Buscar salas por filtros
-    public Optional<List<Sala>> findByNombre(String nombre) {
-        return salaRepository.findByNombre(nombre);
-    }
 }
