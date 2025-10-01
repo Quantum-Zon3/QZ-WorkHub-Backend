@@ -1,11 +1,8 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
 //imports de anotacion springboot
 import com.quantumzone.QZ_Workhub.dominio.dto.RecursoDto;
-import com.quantumzone.QZ_Workhub.dominio.dto.UsuarioDto;
 import com.quantumzone.QZ_Workhub.dominio.enums.TipoRecurso;
 import com.quantumzone.QZ_Workhub.dominio.servicio.RecursoService;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.Recurso;
-import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -25,7 +22,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import java.util.List;
 
 @RestController

@@ -1,12 +1,8 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
-import java.time.LocalDate;
 import java.util.List;
-
+import com.quantumzone.QZ_Workhub.dominio.dto.PagoDto;
 import com.quantumzone.QZ_Workhub.dominio.servicio.PagoService;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.Notificacion;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.Pago;
 //imports de anotacion springboot
-import com.quantumzone.QZ_Workhub.persistencia.entidad.Reserva;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -18,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 //imports para documentar swagen
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,6 +21,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/qzwork_hub/pagos")
 @Tag(name = "Pago", description = "Controlador de pagos")
@@ -43,7 +39,7 @@ public class PagoController {
             @ApiResponse(responseCode = "200", description = "Lista de pagos obtenida con éxito"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<List<Pago>> getAllPagos() {
+    public ResponseEntity<List<PagoDto>> getAllPagos() {
         return new ResponseEntity<>(pagoService.findAll(), HttpStatus.OK);
     }
 
@@ -53,10 +49,13 @@ public class PagoController {
             @ApiResponse(responseCode = "200", description = "Pago encontrado"),
             @ApiResponse(responseCode = "404", description = "Pago no encontrado")
     })
-    public ResponseEntity<Pago> getPagoById(@PathVariable @Parameter(description = "ID del pago") Long id) {
-        return pagoService.findById(id)
-                .map(pago -> new ResponseEntity<>(pago, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    public ResponseEntity<PagoDto> getPagoById(@PathVariable @Parameter(description = "ID del pago") Long id) {
+        try{
+            PagoDto pago = pagoService.findById(id);
+            return ResponseEntity.ok(pago);
+        }catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
@@ -65,8 +64,8 @@ public class PagoController {
             @ApiResponse(responseCode = "201", description = "Pago creado con éxito"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
-    public ResponseEntity<Pago> createPago(@RequestBody @Parameter(description = "Datos del pago a crear") Pago pago) {
-        Pago nuevoPago = pagoService.save(pago);
+    public ResponseEntity<PagoDto> createPago(@RequestBody @Parameter(description = "Datos del pago a crear") PagoDto pago) {
+        PagoDto nuevoPago = pagoService.save(pago);
         return new ResponseEntity<>(nuevoPago, HttpStatus.CREATED);
     }
 
@@ -76,10 +75,10 @@ public class PagoController {
             @ApiResponse(responseCode = "200", description = "Pago actualizado con éxito"),
             @ApiResponse(responseCode = "404", description = "Pago no encontrado")
     })
-    public ResponseEntity<Pago> updatePago(
+    public ResponseEntity<PagoDto> updatePago(
             @PathVariable @Parameter(description = "ID del pago") Long id,
-            @RequestBody @Parameter(description = "Datos actualizados del pago") Pago pago) {
-        Pago pagoActualizada = pagoService.update(pago);
+            @RequestBody @Parameter(description = "Datos actualizados del pago") PagoDto pago) {
+        PagoDto pagoActualizada = pagoService.update(id, pago);
         return new ResponseEntity<>(pagoActualizada, HttpStatus.OK);
     }
 
@@ -91,13 +90,13 @@ public class PagoController {
     })
     public ResponseEntity<Void> deletePago(@PathVariable @Parameter(description = "ID del pago") Long id) {
         try {
-            pagoService.deleteById(id);
+            pagoService.deletePago(id);
             return ResponseEntity.noContent().build();
         } catch (EmptyResultDataAccessException e) {
             return ResponseEntity.notFound().build();
         }
     }
-
+    /*
     @GetMapping("/buscar")
     @Operation(summary = "Buscar pagos por filtros", description = "Busca pagos por monto, fecha, usuario o método de pago.")
     @ApiResponses(value = {
@@ -117,5 +116,5 @@ public class PagoController {
                     .map(notificaciones -> new ResponseEntity<>(notificaciones, HttpStatus.OK))
                     .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
+    */
 }
