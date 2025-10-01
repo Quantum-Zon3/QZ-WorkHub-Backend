@@ -1,4 +1,6 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
+import com.quantumzone.QZ_Workhub.dominio.dto.RecursoDto;
+import com.quantumzone.QZ_Workhub.dominio.dto.RecursoReservadoDto;
 import com.quantumzone.QZ_Workhub.dominio.servicio.RecursoReservadoService;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.RecursoReservado;
 //imports de anotacion springboot
@@ -39,7 +41,7 @@ public class RecursoReservadoController {
             @ApiResponse(responseCode = "200", description = "Lista de recursos reservados obtenida con éxito"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    public ResponseEntity<List<RecursoReservado>> getAllRecursosReservados() {
+    public ResponseEntity<List<RecursoReservadoDto>> getAllRecursosReservados() {
         return new ResponseEntity<>(recursoReservadoService.findAll(), HttpStatus.OK);
     }
 
@@ -49,11 +51,14 @@ public class RecursoReservadoController {
             @ApiResponse(responseCode = "200", description = "Recurso reservado encontrado"),
             @ApiResponse(responseCode = "404", description = "Recurso reservado no encontrado")
     })
-    public ResponseEntity<RecursoReservado> getRecursoReservadoById(
+    public ResponseEntity<RecursoReservadoDto> getRecursoReservadoById(
             @PathVariable @Parameter(description = "ID del recurso reservado") Long id) {
-        return recursoReservadoService.findById(id)
-                .map(reserva -> new ResponseEntity<>(reserva, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        try {
+            RecursoReservadoDto recursoRDto = recursoReservadoService.findById(id);
+            return ResponseEntity.ok(recursoRDto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
@@ -62,10 +67,10 @@ public class RecursoReservadoController {
             @ApiResponse(responseCode = "201", description = "Recurso reservado creado con éxito"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
-    public ResponseEntity<RecursoReservado> createRecursoReservado(
-            @RequestBody @Parameter(description = "Datos del recurso reservado a crear") RecursoReservado recursoReservado) {
-        RecursoReservado nuevoRecurso = recursoReservadoService.save(recursoReservado);
-        return new ResponseEntity<>(nuevoRecurso, HttpStatus.CREATED);
+    public ResponseEntity<RecursoReservadoDto> createRecursoReservado(
+            @RequestBody @Parameter(description = "Datos del recurso reservado a crear") RecursoReservadoDto recursoReservado) {
+        RecursoReservadoDto nuevoRecursoR = recursoReservadoService.save(recursoReservado);
+        return new ResponseEntity<>(nuevoRecursoR, HttpStatus.CREATED);
     }
 
     @PutMapping
@@ -74,10 +79,11 @@ public class RecursoReservadoController {
             @ApiResponse(responseCode = "200", description = "Recurso reservado actualizado con éxito"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
-    public ResponseEntity<RecursoReservado> updateRecursoReservado(
-            @RequestBody @Parameter(description = "Datos actualizados del recurso reservado") RecursoReservado recursoReservado) {
-        RecursoReservado updatedRecurso = recursoReservadoService.update(recursoReservado);
-        return new ResponseEntity<>(updatedRecurso, HttpStatus.OK);
+    public ResponseEntity<RecursoReservadoDto> updateRecursoReservado(
+            @RequestBody @Parameter(description = "id de el recurso a actualizar") Long id,
+            @RequestBody @Parameter(description = "Datos actualizados del recurso reservado") RecursoReservadoDto recursoReservado) {
+        RecursoReservadoDto updatedRecursoR = recursoReservadoService.update(id, recursoReservado);
+        return new ResponseEntity<>(updatedRecursoR, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
@@ -88,7 +94,7 @@ public class RecursoReservadoController {
     })
     public ResponseEntity<Void> deleteRecursoReservado(
             @PathVariable @Parameter(description = "ID del recurso reservado") Long id) {
-        recursoReservadoService.deleteById(id);
+        recursoReservadoService.delete(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
