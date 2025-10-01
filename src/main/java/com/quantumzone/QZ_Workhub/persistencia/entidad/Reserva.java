@@ -40,9 +40,6 @@ public class Reserva {
     private Sala sala;
 
     @OneToMany(mappedBy = "reserva")
-    private List<Pago> pagos;
-
-    @OneToMany(mappedBy = "reserva")
     private List<Notificacion> notificaciones;
 
     @OneToMany(mappedBy = "reserva")
