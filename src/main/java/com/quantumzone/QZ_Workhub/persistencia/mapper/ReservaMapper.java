@@ -86,7 +86,7 @@ public interface ReservaMapper {
     @Mapping(target = "idReserva", ignore = true)             // No editable
     @Mapping(target = "usuario", ignore = true)               // Relación manejada aparte
     @Mapping(target = "sala", ignore = true)                  // Relación manejada aparte
-    @Mapping(target = "pagos", ignore = true)                 // Listas manejadas aparte
+    @Mapping(target = "pago", ignore = true)                 // Listas manejadas aparte
     @Mapping(target = "notificaciones", ignore = true)        // Listas manejadas aparte
     @Mapping(target = "reportes", ignore = true)              // Listas manejadas aparte
     @Mapping(target = "recursosReservados", ignore = true)    // Listas manejadas aparte
