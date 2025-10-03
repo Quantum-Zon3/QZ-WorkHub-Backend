@@ -1,9 +1,10 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
+import com.quantumzone.QZ_Workhub.dominio.dto.ReporteDto;
+import com.quantumzone.QZ_Workhub.dominio.dto.ReservaDto;
 import com.quantumzone.QZ_Workhub.dominio.dto.UsuarioDto;
 import com.quantumzone.QZ_Workhub.dominio.enums.Rol;
 import com.quantumzone.QZ_Workhub.persistencia.dao.UsuarioDAO;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.Usuario;
-import com.quantumzone.QZ_Workhub.persistencia.repositorio.UsuarioRepository;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 /**
  * Implementación del servicio de usuarios
  *
@@ -31,10 +31,14 @@ import java.util.Optional;
 public class UsuarioService {
 
     private final UsuarioDAO usuarioDAO;
+    private final ReservaService reservaService;
+    private final ReporteService reporteService;
 
     @Autowired
-    public UsuarioService(UsuarioDAO usuarioDAO) {
+    public UsuarioService(UsuarioDAO usuarioDAO, ReservaService reservaService, ReporteService reporteService) {
         this.usuarioDAO = usuarioDAO;
+        this.reservaService = reservaService;
+        this.reporteService = reporteService;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -93,17 +97,29 @@ public class UsuarioService {
         log.info("Eliminando usuarios ID: {}", cedula);
 
         // Verificar que el usuarios existe
-        UsuarioDto seller = findById(cedula);
-        /*
-        Regla de negocio: No eliminar si tiene productos
-        Long productCount = UsuarioDao.countProductsBySellerId(id);
-        if (productCount > 0) {
-            log.warn("Intento de eliminar vendedor con productos. ID: {}, Productos: {}", id, productCount);
-            throw new IllegalStateException(
-                    String.format("No se puede eliminar el vendedor porque tiene %d producto(s) asociado(s)", productCount)
-            );
-        }*/
-        // Eliminar vendedor
+        UsuarioDto usuario = findById(cedula);
+        //Regla de negocio: No eliminar si tiene reservas
+        List<ReservaDto> reservas = reservaService.findAll();
+        for (ReservaDto reserva : reservas) {
+            if (reserva.getCedula().equals(cedula)) {
+                log.warn("Intento de eliminar usuario con reserva. ID: {}, reserva: {}",reserva.getIdReserva());
+                throw new IllegalStateException(
+                        String.format("No se puede eliminar el usuario porque tiene %d reservas(s) asociado(s)")
+                );
+            }
+        }
+        //Regla de negocio: No eliminar si tiene reporte
+        List<ReporteDto> reportes = reporteService.findAll();
+        for (ReporteDto reporte : reportes) {
+            if (reporte.getCedula().equals(cedula)) {
+                log.warn("Intento de eliminar usuario con reserva. ID: {}, reserva: {}",reporte.getIdReserva());
+                throw new IllegalStateException(
+                        String.format("No se puede eliminar el usuario porque tiene %d reservas(s) asociado(s)")
+                );
+            }
+        }
+
+        // Eliminar usuario
         boolean deleted = usuarioDAO.delete(cedula);
         if (!deleted) {
             throw new RuntimeException("Error al eliminar usuarios con ID: " + cedula);
