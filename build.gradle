@@ -45,6 +45,22 @@ dependencies {
         // Para usar MapStruct con Lombok
         annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
+		dependencies {
+			// JUnit 5 (incluido en spring-boot-starter-test)
+			testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+			// Mockito (incluido en spring-boot-starter-test)
+			testImplementation 'org.mockito:mockito-core'
+			testImplementation 'org.mockito:mockito-junit-jupiter'
+
+			// AssertJ para assertions fluidas
+			testImplementation 'org.assertj:assertj-core'
+		}
+
+		test {
+			useJUnitPlatform() // Requerido para JUnit 5
+		}
+
 	}
 
 }
