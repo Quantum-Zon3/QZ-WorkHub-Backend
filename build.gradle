@@ -25,7 +25,6 @@ repositories {
 }
 
 dependencies {
-	dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-web'
 		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 		implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -38,32 +37,22 @@ dependencies {
 		compileOnly 'org.projectlombok:lombok'
 		annotationProcessor 'org.projectlombok:lombok'
 
+		// MapStruct para mapeo automático
+		implementation 'org.mapstruct:mapstruct:1.6.3'
+		annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+		// Para usar MapStruct con Lombok
+		annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+		// Testing dependencies
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
-        // MapStruct para mapeo automático
-        implementation 'org.mapstruct:mapstruct:1.6.3'
-        annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-        // Para usar MapStruct con Lombok
-        annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-
-		dependencies {
-			// JUnit 5 (incluido en spring-boot-starter-test)
-			testImplementation 'org.springframework.boot:spring-boot-starter-test'
-
-			// Mockito (incluido en spring-boot-starter-test)
-			testImplementation 'org.mockito:mockito-core'
-			testImplementation 'org.mockito:mockito-junit-jupiter'
-
-			// AssertJ para assertions fluidas
-			testImplementation 'org.assertj:assertj-core'
-		}
-
-		test {
-			useJUnitPlatform() // Requerido para JUnit 5
-		}
-
-	}
-
+		testImplementation 'org.mockito:mockito-inline:5.2.0'
+		testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
 }
+
+	test {
+			useJUnitPlatform() // Requerido para JUnit 5
+			jvmArgs '-XX:+EnableDynamicAgentLoading'
+	}
 
 tasks.named('test') {
 	useJUnitPlatform()
