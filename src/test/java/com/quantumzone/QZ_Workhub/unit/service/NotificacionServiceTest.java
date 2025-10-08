@@ -12,7 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +29,9 @@ public class NotificacionServiceTest {
     // Dependencias Mockeadas
     @Mock
     private NotificacionDAO notificacionDAO;
+
+    @Mock
+    private Clock clock;
 
     //Clase bajo prueba (System under test)
     @InjectMocks
@@ -45,12 +51,15 @@ public class NotificacionServiceTest {
         idReservaValida = 1L;
         notificacionValida = new NotificacionDto();
 
+        Instant fixedInstant = Instant.parse("2025-10-08T10:00:00Z");
+        when(clock.instant()).thenReturn(fixedInstant);
+        when(clock.getZone()).thenReturn(ZoneId.systemDefault());
         /**
          * Setteamos los datos de pueba que son necesarios
          */
         notificacionValida.setIdNotificacion(idNotificacionValida);
         notificacionValida.setMotivo("motivo");
-        notificacionValida.setFecha(LocalDateTime.now());
+        notificacionValida.setFecha(LocalDateTime.now(clock));
         notificacionValida.setDescripcion("descripcion");
         notificacionValida.setIdReserva(idReservaValida);
     }
@@ -65,7 +74,7 @@ public class NotificacionServiceTest {
         NotificacionDto toCreate = new NotificacionDto();
         toCreate.setMotivo("Carlos Perez");
         toCreate.setDescripcion("Descripcion");
-        toCreate.setFecha(LocalDateTime.now());
+        toCreate.setFecha(LocalDateTime.now(clock));
         toCreate.setIdReserva(idReservaValida);
 
         NotificacionDto persisted = new NotificacionDto();
@@ -147,14 +156,14 @@ public class NotificacionServiceTest {
         NotificacionDto existing = new NotificacionDto();
         existing.setIdNotificacion(idNotificacionValida);
         existing.setMotivo("Motivo Viejo");
-        existing.setFecha(LocalDateTime.now());
+        existing.setFecha(LocalDateTime.now(clock));
         existing.setDescripcion("Descripcion Vieja");
         existing.setIdReserva(notificacionValida.getIdReserva());
 
         NotificacionDto update = new NotificacionDto();
         update.setMotivo("Motivo nuevo");
         update.setDescripcion("Descripcion Nuevo");
-        update.setFecha(LocalDateTime.now());
+        update.setFecha(LocalDateTime.now(clock));
         update.setIdReserva(3L);
 
         NotificacionDto updated = new NotificacionDto();

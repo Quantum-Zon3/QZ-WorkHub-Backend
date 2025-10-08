@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -16,10 +18,12 @@ import java.util.Optional;
 public class NotificacionService{
 
     private final NotificacionDAO notificacionDAO;
+    private final Clock clock;
 
     @Autowired
-    public NotificacionService(NotificacionDAO notificacionDAO) {
+    public NotificacionService(NotificacionDAO notificacionDAO, Clock clock) {
         this.notificacionDAO = notificacionDAO;
+        this.clock = clock;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -107,13 +111,15 @@ public class NotificacionService{
      * METODO PRIVADO: Validar datos de creación de una notificacion
      */
     private void validarNotificacion(NotificacionDto notificacionDto) {
+        LocalDateTime ahora = LocalDateTime.now(clock);
+
         if (notificacionDto.getMotivo() == null || notificacionDto.getMotivo().trim().isEmpty()) {
             throw new IllegalArgumentException("El motivo de la notificacion es obligatorio");
         }
 
         //GENERA EXCEPCION YA QUE AL MOMENTO DE EL TEST LA HORA CAMBIA POR MILISEGUNDOS
 
-        if (notificacionDto.getFecha() == null /*|| notificacionDto.getFecha().isBefore(LocalDateTime.now())*/) {
+        if (notificacionDto.getFecha() == null || notificacionDto.getFecha().isBefore(ahora)) {
             throw new IllegalArgumentException("La fecha de la notificación es obligatoria y debe ser válida");
         }
 

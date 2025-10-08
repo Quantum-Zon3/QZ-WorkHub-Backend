@@ -5,6 +5,8 @@ import io.swagger.v3.oas.models.info.Info;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Clock;
+
 @Configuration
 
 public class OpenApiConfig {
@@ -15,6 +17,10 @@ public class OpenApiConfig {
                         .title("QZ-WorkHub API")
                         .version("v1.0")
                         .description("API documentation for QZ-WorkHub API application"));
+    }
+    @Bean
+    public Clock clock(){
+        return Clock.systemDefaultZone(); //Usa el reloj del sistema
     }
 
 }
