@@ -1,6 +1,9 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
 import java.time.LocalDateTime;
 
+import com.quantumzone.QZ_Workhub.dominio.dto.NotificacionDto;
+import com.quantumzone.QZ_Workhub.dominio.dto.RecursoReservadoDto;
+import com.quantumzone.QZ_Workhub.dominio.dto.ReporteDto;
 import com.quantumzone.QZ_Workhub.dominio.dto.ReservaDto;
 import com.quantumzone.QZ_Workhub.persistencia.dao.ReservaDAO;
 
@@ -32,10 +35,16 @@ import java.util.List;
 public class ReservaService {
 
     private final ReservaDAO reservaDAO;
+    private final RecursoReservadoService recursoReservadoService;
+    private final ReporteService reporteService;
+    private final NotificacionService notificacionService;
 
     @Autowired
-    public ReservaService(ReservaDAO reservaDAO) {
+    public ReservaService(ReservaDAO reservaDAO, RecursoReservadoService recursoReservadoService, ReporteService reporteService, NotificacionService notificacionService) {
         this.reservaDAO = reservaDAO;
+        this.recursoReservadoService = recursoReservadoService;
+        this.reporteService = reporteService;
+        this.notificacionService = notificacionService;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -90,6 +99,42 @@ public class ReservaService {
 
         //verificar que la reserva si exista
         ReservaDto reservaBuscada = findById(id);
+
+        //Regla de negocio: No eliminar si tiene reservas
+        List<RecursoReservadoDto> recursoReservados = recursoReservadoService.findAll();
+        for (RecursoReservadoDto recursoReservado : recursoReservados) {
+            if (recursoReservado.getIdReserva().equals(id)) {
+                log.warn("Intento de eliminar reserva con recurso. ID: {}, recurso: {}",recursoReservado.getIdReserva());
+                throw new IllegalStateException(
+                        String.format("No se puede eliminar el recurso porque tiene %d reservas(s) asociado(s)")
+                );
+            }
+        }
+
+        //Regla de negocio: No eliminar si tiene reportes
+        List<ReporteDto> reportes = reporteService.findAll();
+        for (ReporteDto reporte : reportes) {
+            if (reporte.getIdReserva().equals(id)) {
+                log.warn("Intento de eliminar reserva con reportes. ID: {}, reportes: {}",reporte.getIdReserva());
+                throw new IllegalStateException(
+                        String.format("No se puede eliminar el reserva porque tiene %d reporte(s) asociado(s)")
+                );
+            }
+        }
+
+        //Regla de negocio: No eliminar si tiene reportes
+        List<NotificacionDto> notificaciones = notificacionService.findAll();
+        for (NotificacionDto notificacionDto : notificaciones) {
+            if (notificacionDto.getIdReserva().equals(id)) {
+                log.warn("Intento de eliminar recurso con reserva. ID: {}, reserva: {}",notificacionDto.getIdReserva());
+                throw new IllegalStateException(
+                        String.format("No se puede eliminar el recurso porque tiene %d reservas(s) asociado(s)")
+                );
+            }
+        }
+
+
+
         //Eliminar reserva
         boolean eliminar = reservaDAO.delete(id);
         if (!eliminar) {

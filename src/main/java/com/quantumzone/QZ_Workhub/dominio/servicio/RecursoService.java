@@ -1,14 +1,11 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
 import com.quantumzone.QZ_Workhub.dominio.dto.RecursoDto;
-import com.quantumzone.QZ_Workhub.dominio.dto.ReporteDto;
-import com.quantumzone.QZ_Workhub.dominio.dto.UsuarioDto;
+import com.quantumzone.QZ_Workhub.dominio.dto.RecursoReservadoDto;
 import com.quantumzone.QZ_Workhub.dominio.enums.TipoRecurso;
 import com.quantumzone.QZ_Workhub.persistencia.dao.RecursoDAO;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.Recurso;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.quantumzone.QZ_Workhub.persistencia.repositorio.RecursoRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -34,10 +31,12 @@ import java.util.Optional;
 public class RecursoService {
 
     private final RecursoDAO recursoDao;
+    private final RecursoReservadoService recursoReservadoService;
 
     @Autowired
-    public RecursoService(RecursoDAO recursoDao) {
+    public RecursoService(RecursoDAO recursoDao,RecursoReservadoService recursoReservadoService) {
         this.recursoDao = recursoDao;
+        this.recursoReservadoService = recursoReservadoService;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -82,6 +81,17 @@ public class RecursoService {
 
         // Verificar que el recurso existe
         findById(id);
+
+        //Regla de negocio: No eliminar si tiene reservas
+        List<RecursoReservadoDto> recursoReservados = recursoReservadoService.findAll();
+        for (RecursoReservadoDto recursoReservado : recursoReservados) {
+            if (recursoReservado.getIdReserva().equals(id)) {
+                log.warn("Intento de eliminar recurso con reserva. ID: {}, reserva: {}",recursoReservado.getIdReserva());
+                throw new IllegalStateException(
+                        String.format("No se puede eliminar el recurso porque tiene %d reservas(s) asociado(s)")
+                );
+            }
+        }
 
         // Eliminar recurso
         boolean deleted = recursoDao.delete(id);
