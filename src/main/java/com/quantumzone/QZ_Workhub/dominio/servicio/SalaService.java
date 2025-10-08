@@ -1,4 +1,5 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
+import com.quantumzone.QZ_Workhub.dominio.dto.ReservaDto;
 import com.quantumzone.QZ_Workhub.dominio.dto.SalaDto;
 import com.quantumzone.QZ_Workhub.persistencia.dao.SalaDAO;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +27,13 @@ import java.util.List;
 public class SalaService {
 
     private final SalaDAO  salaDAO;
+    private final ReservaService reservaService;
 
     @Autowired
-    public SalaService(SalaDAO  salaDAO) {
+    public SalaService(SalaDAO  salaDAO,  ReservaService reservaService) {
         this.salaDAO = salaDAO;
+        this.reservaService = reservaService;
+
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -84,6 +88,17 @@ public class SalaService {
 
         //verificar que la sala si existe
         SalaDto salaBusacada = findById(id);
+
+        //Regla de negocio: No eliminar si tiene reservas
+        List<ReservaDto> reservas = reservaService.findAll();
+        for (ReservaDto reserva : reservas) {
+            if (reserva.getIdReserva().equals(id)) {
+                log.warn("Intento de eliminar usuario con reserva. ID: {}, reserva: {}",reserva.getIdReserva());
+                throw new IllegalStateException(
+                        String.format("No se puede eliminar el usuario porque tiene %d reservas(s) asociado(s)")
+                );
+            }
+        }
          // Eliminar sala
         boolean eliminar = salaDAO.delete(id);
         if (!eliminar) {
