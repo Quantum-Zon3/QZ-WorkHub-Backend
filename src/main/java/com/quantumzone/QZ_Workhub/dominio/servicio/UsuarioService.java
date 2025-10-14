@@ -214,6 +214,15 @@ public class UsuarioService {
             throw new IllegalArgumentException("El teléfono solo puede contener números, espacios, '+' o '-'");
         }
 
+        for (int i = 0; i <findAll().size(); i++) {
+            if (findAll().get(i).getCedula().equals(usuarioDto.getCedula())) {
+                throw new IllegalArgumentException("El cedula es ya esta registrado");
+            }
+            if (findAll().get(i).getEmail().equals(usuarioDto.getEmail())) {
+                throw new IllegalArgumentException("El email es ya esta registrado");
+            }
+        }
+
         // Validar fecha de registro
         if (usuarioDto.getFechaRegistro() == null) {
             throw new IllegalArgumentException("La fecha de registro es obligatoria");
