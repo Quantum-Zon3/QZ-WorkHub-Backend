@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -99,14 +100,23 @@ public class UsuarioController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = UsuarioDto.class)
                     )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuarios no encontrado"
             )
     })
     public ResponseEntity<List<UsuarioDto>> finAll() {
         log.debug("GET /qzwork_hub/usuarios - Obteniendo todos los usaurio");
+        try {
+            List<UsuarioDto> usaurios = usuarioService.findAll();
+            log.debug("Se encontraron {} usaurios", usaurios.size());
+            return ResponseEntity.ok(usaurios);
+        }catch (EmptyResultDataAccessException e){
+            log.error("No se encontro el usaurio exitosamente");
+            return ResponseEntity.notFound().build();
+        }
 
-        List<UsuarioDto> usaurios = usuarioService.findAll();
-        log.debug("Se encontraron {} usaurios", usaurios.size());
-        return ResponseEntity.ok(usaurios);
     }
 
 
