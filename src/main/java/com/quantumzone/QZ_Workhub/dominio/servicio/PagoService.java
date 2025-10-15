@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,11 +30,13 @@ import java.util.Optional;
 public class PagoService {
 
     private final PagoDAO pagoDAO;
+    private final Clock clock;
 
 
     @Autowired
-    public PagoService(PagoDAO pagoDAO) {
+    public PagoService(PagoDAO pagoDAO, Clock clock) {
         this.pagoDAO = pagoDAO;
+        this.clock = clock;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -60,11 +63,13 @@ public class PagoService {
      */
     @Transactional(readOnly = true)
     public PagoDto findById(Long id) {
+        log.info("Buscando pago por ID: {}", id);
         log.debug("Buscando pago por ID: {}", id);
 
         return pagoDAO.findById(id)
                 .orElseThrow(() -> {
                     log.warn("pago no encontrada con ID: {}", id);
+                    log.info("No se encontró pago");
                     return new RuntimeException("pago no encontrada con ID: " + id);
                 });
     }
@@ -74,8 +79,9 @@ public class PagoService {
      */
     @Transactional(readOnly = true)
     public List<PagoDto> findAll() {
-        log.debug("Obteniendo todos los reporte: {}", pagoDAO.findAll().size());
-        return pagoDAO.findAll();
+        List<PagoDto> pagos = pagoDAO.findAll();
+        log.debug("Obteniendo todos los reporte: {}", pagos.size());
+        return pagos;
     }
 
     /**
@@ -119,6 +125,7 @@ public class PagoService {
      * MÉTODO PRIVADO: Validar datos de creación de un pago
      */
     private void validarPago(PagoDto pagoDto) {
+        LocalDateTime ahora = LocalDateTime.now(clock);
         // Validar id del pago (opcional, pero si viene no puede ser negativo)
         if (pagoDto.getIdPago() != null && pagoDto.getIdPago() <= 0) {
             throw new IllegalArgumentException("El idPago, si se envía, debe ser un número positivo");
@@ -136,7 +143,7 @@ public class PagoService {
         if (pagoDto.getFechaRealizacion() == null) {
             throw new IllegalArgumentException("La fecha de realización es obligatoria");
         }
-        if (pagoDto.getFechaRealizacion().isAfter(LocalDateTime.now())) {
+        if (pagoDto.getFechaRealizacion().isAfter(ahora)) {
             throw new IllegalArgumentException("La fecha de realización no puede ser en el futuro");
         }
 
