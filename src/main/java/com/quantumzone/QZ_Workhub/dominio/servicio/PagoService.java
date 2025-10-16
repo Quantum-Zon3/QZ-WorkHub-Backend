@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -31,12 +32,14 @@ public class PagoService {
 
     private final PagoDAO pagoDAO;
     private final ReservaService reservaService;
+    private final Clock clock;
 
 
     @Autowired
-    public PagoService(PagoDAO pagoDAO, ReservaService reservaService) {
+    public PagoService(PagoDAO pagoDAO, ReservaService reservaService, Clock clock) {
         this.pagoDAO = pagoDAO;
         this.reservaService = reservaService;
+        this.clock = clock;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -122,6 +125,7 @@ public class PagoService {
      * MÉTODO PRIVADO: Validar datos de creación de un pago
      */
     private void validarPago(PagoDto pagoDto) {
+        LocalDateTime ahora = LocalDateTime.now(clock);
         // Validar id del pago (opcional, pero si viene no puede ser negativo)
         if (pagoDto.getIdPago() != null && pagoDto.getIdPago() <= 0) {
             throw new IllegalArgumentException("El idPago, si se envía, debe ser un número positivo");
@@ -139,7 +143,7 @@ public class PagoService {
         if (pagoDto.getFechaRealizacion() == null) {
             throw new IllegalArgumentException("La fecha de realización es obligatoria");
         }
-        if (pagoDto.getFechaRealizacion().isAfter(LocalDateTime.now())) {
+        if (pagoDto.getFechaRealizacion().isAfter(LocalDateTime.now(clock))) {
             throw new IllegalArgumentException("La fecha de realización no puede ser en el futuro");
         }
 
