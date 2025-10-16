@@ -3,6 +3,9 @@ import java.util.List;
 import com.quantumzone.QZ_Workhub.dominio.dto.PagoDto;
 import com.quantumzone.QZ_Workhub.dominio.servicio.PagoService;
 //imports de anotacion springboot
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -25,6 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/qzwork_hub/pagos")
 @Tag(name = "Pago", description = "Controlador de pagos")
+@Slf4j
 public class PagoController {
     private final PagoService pagoService;
 
@@ -33,66 +37,201 @@ public class PagoController {
         this.pagoService = pagoService;
     }
 
+    /**
+     * Obtener todas los pagos
+     */
     @GetMapping
-    @Operation(summary = "Obtener todos los pagos", description = "Devuelve una lista de todos los pagos registrados.")
+    @Operation(
+            summary = "Listar todas los pagos",
+            description = "Obtiene la lista completa de pagos"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de pagos obtenida con éxito"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de pagos obtenida exitosamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PagoDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Pagos no encontrado"
+            )
     })
-    public ResponseEntity<List<PagoDto>> getAllPagos() {
-        return new ResponseEntity<>(pagoService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<PagoDto>> findAll() {
+        log.debug("GET /qzwork_hub/pagos - Obteniendo todos los pagos");
+        try{
+            List<PagoDto> pagos = pagoService.findAll();
+            log.debug("Se encontraron {} notificaciones", pagos.size());
+            return ResponseEntity.ok(pagos);
+        }catch(EmptyResultDataAccessException e){
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
+    /**
+     * Obtener pago por ID
+     */
     @GetMapping("/{id}")
-    @Operation(summary = "Obtener pago por ID", description = "Devuelve un pago específico basado en su ID.")
+    @Operation(
+            summary = "Buscar pago por ID",
+            description = "Obtiene la información completa de un pago"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Pago encontrado"),
-            @ApiResponse(responseCode = "404", description = "Pago no encontrado")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "pago encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PagoDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "pago no encontrado"
+            )
     })
-    public ResponseEntity<PagoDto> getPagoById(@PathVariable @Parameter(description = "ID del pago") Long id) {
-        try{
+    public ResponseEntity<PagoDto> findById(
+            @Parameter(description = "ID del pago", required = true, example = "1")
+            @PathVariable Long id
+    ) {
+        log.debug("GET /qzwork_hub/pagos/{} - Buscando pago", id);
+
+        try {
             PagoDto pago = pagoService.findById(id);
             return ResponseEntity.ok(pago);
-        }catch (RuntimeException e) {
+        } catch (RuntimeException e) {
+            log.warn("pago no encontrado con ID: {}", id);
             return ResponseEntity.notFound().build();
         }
     }
 
+    /**
+     * Crear un nuevo pago
+     */
     @PostMapping
-    @Operation(summary = "Crear un nuevo pago", description = "Crea un nuevo pago con los datos proporcionados.")
+    @Operation(
+            summary = "Crear nueva notificacion",
+            description = "Crea un nuevo pago asociado a una reserva existente"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Pago creado con éxito"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos")
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Pago creado exitosamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PagoDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Datos inválidos",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = String.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno del servidor"
+            )
     })
-    public ResponseEntity<PagoDto> createPago(@RequestBody @Parameter(description = "Datos del pago a crear") PagoDto pago) {
-        PagoDto nuevoPago = pagoService.save(pago);
-        return new ResponseEntity<>(nuevoPago, HttpStatus.CREATED);
+    public ResponseEntity<PagoDto> save(
+            @Parameter(description = "Datos del pago a crear", required = true)
+            @RequestBody PagoDto createDTO
+    ) {
+        log.info("POST /qzwork_hub/pagos - Creando pago: {}", createDTO.getIdPago());
+
+        try {
+            PagoDto pagoSave = pagoService.save(createDTO);
+            log.info("Pago creado exitosamente con ID: {}", pagoSave.getIdPago());
+            return ResponseEntity.status(HttpStatus.CREATED).body(pagoSave);
+        } catch (IllegalArgumentException e) {
+            log.warn("Error de validación al crear pago: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 
+    /**
+     * Actualizar pago existente
+     */
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar un pago", description = "Actualiza los datos de un pago existente.")
+    @Operation(
+            summary = "Actualizar pago",
+            description = "Actualiza la información de un pago. No se puede cambiar la reserva."
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Pago actualizado con éxito"),
-            @ApiResponse(responseCode = "404", description = "Pago no encontrado")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "pago actualizado exitosamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = PagoDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Datos inválidos"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Pago no encontrado"
+            )
     })
-    public ResponseEntity<PagoDto> updatePago(
-            @PathVariable @Parameter(description = "ID del pago") Long id,
-            @RequestBody @Parameter(description = "Datos actualizados del pago") PagoDto pago) {
-        PagoDto pagoActualizada = pagoService.update(id, pago);
-        return new ResponseEntity<>(pagoActualizada, HttpStatus.OK);
+    public ResponseEntity<PagoDto> update(
+            @Parameter(description = "ID del pago a actualizar", required = true, example = "1")
+            @PathVariable Long id,
+            @Parameter(description = "Datos a actualizar del pago", required = true)
+            @RequestBody PagoDto updateDTO
+    ) {
+        log.info("PUT /qzwork_hub/pagos/{} - Actualizando pago", id);
+
+        try {
+            PagoDto updatedPago = pagoService.update(id, updateDTO);
+            log.info("pago actualizada exitosamente ID: {}", id);
+            return ResponseEntity.ok(updatedPago);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("no encontrado")) {
+                log.warn("Pago no encontrada para actualizar ID: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+            log.warn("Error al actualizar pago ID {}: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 
+    /**
+     * Eliminar pago
+     */
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar un pago", description = "Elimina un pago basado en su ID.")
+    @Operation(
+            summary = "Eliminar pago",
+            description = "Elimina una pago del sistema"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Pago eliminado con éxito"),
-            @ApiResponse(responseCode = "404", description = "Pago no encontrado")
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Pago eliminada exitosamente"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Pago no encontrada"
+            )
     })
-    public ResponseEntity<Void> deletePago(@PathVariable @Parameter(description = "ID del pago") Long id) {
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "ID del pago a eliminar", required = true, example = "1")
+            @PathVariable Long id
+    ) {
+        log.info("DELETE /qzwork_hub/pago/{} - Eliminando pago", id);
+
         try {
             pagoService.deletePago(id);
+            log.info("Pago eliminado exitosamente ID: {}", id);
             return ResponseEntity.noContent().build();
-        } catch (EmptyResultDataAccessException e) {
+        } catch (RuntimeException e) {
+            log.warn("Pago no encontrado para eliminar ID: {}", id);
             return ResponseEntity.notFound().build();
         }
     }

@@ -1,6 +1,7 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
 import com.quantumzone.QZ_Workhub.dominio.dto.PagoDto;
 import com.quantumzone.QZ_Workhub.persistencia.dao.PagoDAO;
+import com.quantumzone.QZ_Workhub.persistencia.dao.ReservaDAO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,12 +31,14 @@ import java.util.Optional;
 public class PagoService {
 
     private final PagoDAO pagoDAO;
+    private final ReservaService reservaService;
     private final Clock clock;
 
 
     @Autowired
-    public PagoService(PagoDAO pagoDAO, Clock clock) {
+    public PagoService(PagoDAO pagoDAO, ReservaService reservaService, Clock clock) {
         this.pagoDAO = pagoDAO;
+        this.reservaService = reservaService;
         this.clock = clock;
         // Inicializamos algunos datos si es necesario
         initSampleData();
@@ -63,13 +66,11 @@ public class PagoService {
      */
     @Transactional(readOnly = true)
     public PagoDto findById(Long id) {
-        log.info("Buscando pago por ID: {}", id);
         log.debug("Buscando pago por ID: {}", id);
 
         return pagoDAO.findById(id)
                 .orElseThrow(() -> {
                     log.warn("pago no encontrada con ID: {}", id);
-                    log.info("No se encontró pago");
                     return new RuntimeException("pago no encontrada con ID: " + id);
                 });
     }
@@ -79,9 +80,8 @@ public class PagoService {
      */
     @Transactional(readOnly = true)
     public List<PagoDto> findAll() {
-        List<PagoDto> pagos = pagoDAO.findAll();
-        log.debug("Obteniendo todos los reporte: {}", pagos.size());
-        return pagos;
+        log.debug("Obteniendo todos los reporte: {}", pagoDAO.findAll().size());
+        return pagoDAO.findAll();
     }
 
     /**
@@ -143,7 +143,7 @@ public class PagoService {
         if (pagoDto.getFechaRealizacion() == null) {
             throw new IllegalArgumentException("La fecha de realización es obligatoria");
         }
-        if (pagoDto.getFechaRealizacion().isAfter(ahora)) {
+        if (pagoDto.getFechaRealizacion().isAfter(LocalDateTime.now(clock))) {
             throw new IllegalArgumentException("La fecha de realización no puede ser en el futuro");
         }
 
@@ -160,6 +160,10 @@ public class PagoService {
         // Validar id de reserva
         if (pagoDto.getIdReserva() == null || pagoDto.getIdReserva() <= 0) {
             throw new IllegalArgumentException("El id de la reserva es obligatorio y debe ser un número positivo");
+        }
+
+        if (reservaService.findById(pagoDto.getIdReserva()) == null ) {
+            throw new IllegalArgumentException("El id de la reserva no existe");
         }
     }
 }

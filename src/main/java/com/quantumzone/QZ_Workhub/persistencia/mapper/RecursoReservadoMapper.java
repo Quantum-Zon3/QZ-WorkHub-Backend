@@ -29,7 +29,7 @@ public interface RecursoReservadoMapper {
      *   (opcional: puedes exponer solo idRecurso y idReserva en el DTO)
      */
     @Mapping(target = "idReserva", source = "reserva",qualifiedByName = "createIdFromReserva")
-    @Mapping(target = "idRecursoReservado", source = "recurso",qualifiedByName = "createIdFromRecurso")
+    @Mapping(target = "idRecurso", source = "recurso",qualifiedByName = "createIdFromRecurso")
     @Mapping(target = "id", source = "id")
     @Mapping(target = "cantidad", source = "cantidad")
     @Mapping(target = "fechaInicio", source = "fechaInicio")
@@ -41,7 +41,7 @@ public interface RecursoReservadoMapper {
      * Convierte lista de RecursoReservado a lista de RecursoReservadoDTO
      */
     @Mapping(target = "idReserva", source = "reserva", qualifiedByName = "createIdFromReserva")
-    @Mapping(target = "idRecursoReservado", source = "recurso",qualifiedByName = "createIdFromRecurso")
+    @Mapping(target = "idRecurso", source = "recurso",qualifiedByName = "createIdFromRecurso")
     @Mapping(target = "id", source = "id")
     @Mapping(target = "cantidad", source = "cantidad")
     @Mapping(target = "fechaInicio", source = "fechaInicio")
@@ -57,7 +57,7 @@ public interface RecursoReservadoMapper {
      * - recurso y reserva: Se asignan manualmente en la lógica de negocio
      */
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "recurso", source = "idRecursoReservado", qualifiedByName = "createRecursoFromId")
+    @Mapping(target = "recurso", source = "idRecurso", qualifiedByName = "createRecursoFromId")
     @Mapping(target = "reserva", source = "idReserva", qualifiedByName = "createReservaFromId")
     @Mapping(target = "cantidad", source = "cantidad")
     @Mapping(target = "fechaInicio", source = "fechaInicio")

@@ -29,7 +29,7 @@ public class RecursoReservadoDto {
     private Integer montoTotal;
     
     @Schema(description = "ID del recurso solicitado", example = "1", required = true)
-    private Long idRecursoReservado;
+    private Long idRecurso;
 
     @Schema(description = "ID de la reserva creada", example = "1", required = true)
     private Long idReserva;

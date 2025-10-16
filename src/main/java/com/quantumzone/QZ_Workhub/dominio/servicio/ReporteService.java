@@ -29,12 +29,16 @@ import java.util.Optional;
 public class ReporteService {
 
     private final ReporteDAO reporteDAO;
+    private final UsuarioService usuarioService;
+    private final ReservaService reservaService;
 
     @Autowired
-    public ReporteService(ReporteDAO reporteDAO) {
+    public ReporteService(ReporteDAO reporteDAO, UsuarioService usuarioService, ReservaService reservaService) {
         this.reporteDAO = reporteDAO;
         // Inicializamos algunos datos si es necesario
         initSampleData();
+        this.usuarioService = usuarioService;
+        this.reservaService = reservaService;
     }
 
     private void initSampleData() {
@@ -145,6 +149,14 @@ public class ReporteService {
         // Validar id de la reserva
         if (reporteDto.getIdReserva() == null || reporteDto.getIdReserva() <= 0) {
             throw new IllegalArgumentException("El id de la reserva es obligatorio y debe ser un número positivo");
+        }
+
+        if (reservaService.findById(reporteDto.getIdReserva()) == null ) {
+            throw new IllegalArgumentException("El id de la reserva no existe");
+        }
+
+        if (usuarioService.findById(reporteDto.getCedula()) == null) {
+            throw new IllegalArgumentException("El cedula no existe");
         }
     }
 

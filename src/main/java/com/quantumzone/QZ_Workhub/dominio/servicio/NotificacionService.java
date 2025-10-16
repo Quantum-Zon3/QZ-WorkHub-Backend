@@ -18,11 +18,13 @@ import java.util.Optional;
 public class NotificacionService{
 
     private final NotificacionDAO notificacionDAO;
+    private final ReservaService reservaService;
     private final Clock clock;
 
     @Autowired
-    public NotificacionService(NotificacionDAO notificacionDAO, Clock clock) {
+    public NotificacionService(NotificacionDAO notificacionDAO, ReservaService reservaService, Clock clock) {
         this.notificacionDAO = notificacionDAO;
+        this.reservaService = reservaService;
         this.clock = clock;
         // Inicializamos algunos datos si es necesario
         initSampleData();
@@ -112,7 +114,6 @@ public class NotificacionService{
      */
     private void validarNotificacion(NotificacionDto notificacionDto) {
         LocalDateTime ahora = LocalDateTime.now(clock);
-
         if (notificacionDto.getMotivo() == null || notificacionDto.getMotivo().trim().isEmpty()) {
             throw new IllegalArgumentException("El motivo de la notificacion es obligatorio");
         }
@@ -139,6 +140,10 @@ public class NotificacionService{
         // Validar longitud del descripcion
         if (notificacionDto.getDescripcion().length() > 200) {
             throw new IllegalArgumentException("El motivo no puede exceder 200 caracteres");
+        }
+
+        if (reservaService.findById(notificacionDto.getIdReserva()) == null ) {
+            throw new IllegalArgumentException("reserva no encontrada");
         }
     }
 

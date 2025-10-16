@@ -7,6 +7,7 @@ import com.quantumzone.QZ_Workhub.persistencia.dao.UsuarioDAO;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ public class UsuarioService {
     private final ReporteService reporteService;
 
     @Autowired
-    public UsuarioService(UsuarioDAO usuarioDAO, ReservaService reservaService, ReporteService reporteService) {
+    public UsuarioService(UsuarioDAO usuarioDAO, ReservaService reservaService, @Lazy ReporteService reporteService) {
         this.usuarioDAO = usuarioDAO;
         this.reservaService = reservaService;
         this.reporteService = reporteService;
@@ -212,6 +213,15 @@ public class UsuarioService {
         }
         if (!usuarioDto.getTelefono().matches("^[0-9+\\- ]+$")) {
             throw new IllegalArgumentException("El teléfono solo puede contener números, espacios, '+' o '-'");
+        }
+
+        for (int i = 0; i <findAll().size(); i++) {
+            if (findAll().get(i).getCedula().equals(usuarioDto.getCedula())) {
+                throw new IllegalArgumentException("El cedula es ya esta registrado");
+            }
+            if (findAll().get(i).getEmail().equals(usuarioDto.getEmail())) {
+                throw new IllegalArgumentException("El email es ya esta registrado");
+            }
         }
 
         // Validar fecha de registro

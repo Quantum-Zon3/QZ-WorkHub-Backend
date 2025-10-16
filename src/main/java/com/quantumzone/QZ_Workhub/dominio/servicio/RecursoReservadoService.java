@@ -4,6 +4,7 @@ import com.quantumzone.QZ_Workhub.dominio.dto.RecursoReservadoDto;
 import com.quantumzone.QZ_Workhub.persistencia.dao.RecursoReservadoDAO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,10 +31,14 @@ import java.util.List;
 public class RecursoReservadoService {
 
     private final RecursoReservadoDAO recursoRDao;
+    private final ReservaService reservaService;
+    private final RecursoService recursoService;
 
     @Autowired
-    public RecursoReservadoService(RecursoReservadoDAO recursoRDao) {
+    public RecursoReservadoService(RecursoReservadoDAO recursoRDao, @Lazy ReservaService reservaService,@Lazy RecursoService recursoService) {
         this.recursoRDao = recursoRDao;
+        this.reservaService = reservaService;
+        this.recursoService = recursoService;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -44,13 +49,13 @@ public class RecursoReservadoService {
 
     // Guardar un recurso
     public RecursoReservadoDto save(RecursoReservadoDto recursoRDto) {
-        log.info("Creando nuevo recurso reservado con id: {}", recursoRDto.getIdRecursoReservado());
+        log.info("Creando nuevo recurso reservado con id: {}", recursoRDto.getId());
         //Validaciones de negocio
         validarRecursoR(recursoRDto);
 
         //Creacion del recurso reservado
         RecursoReservadoDto recursoRCreado = recursoRDao.save(recursoRDto);
-        log.info("Recurso reservado creado: {}", recursoRCreado.getIdRecursoReservado());
+        log.info("Recurso reservado creado: {}", recursoRCreado.getId());
         return recursoRCreado;
     }
 
@@ -107,14 +112,23 @@ public class RecursoReservadoService {
     private void validarRecursoR(RecursoReservadoDto recursoRDto) {
 
         // Validar id de recurso
-        if (recursoRDto.getIdRecursoReservado() == null || recursoRDto.getIdRecursoReservado() == 0) {
+        if (recursoRDto.getIdRecurso() == null || recursoRDto.getIdRecurso() == 0) {
             throw new IllegalArgumentException("El id del recurso solicitado es obligatorio");
+        }
+
+        if (recursoService.findById(recursoRDto.getId()) == null) {
+            throw new IllegalArgumentException("Reser no encontrada");
         }
 
         // Validar id de reserva
         if (recursoRDto.getIdReserva() == null || recursoRDto.getIdReserva() == 0) {
             throw new IllegalArgumentException("El id de la reserva es obligatio");
         }
+
+        if(reservaService.findById(recursoRDto.getIdReserva()) == null) {
+            throw new IllegalArgumentException("Reserva no encontrada");
+        }
+
 
         // Validar la cantidad
         if (recursoRDto.getCantidad() == null || recursoRDto.getCantidad() == 0) {
