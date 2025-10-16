@@ -7,6 +7,7 @@ import com.quantumzone.QZ_Workhub.persistencia.dao.UsuarioDAO;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ public class UsuarioService {
     private final ReporteService reporteService;
 
     @Autowired
-    public UsuarioService(UsuarioDAO usuarioDAO, ReservaService reservaService, ReporteService reporteService) {
+    public UsuarioService(UsuarioDAO usuarioDAO, ReservaService reservaService, @Lazy ReporteService reporteService) {
         this.usuarioDAO = usuarioDAO;
         this.reservaService = reservaService;
         this.reporteService = reporteService;

@@ -7,6 +7,8 @@ import com.quantumzone.QZ_Workhub.dominio.dto.ReporteDto;
 import com.quantumzone.QZ_Workhub.dominio.dto.ReservaDto;
 import com.quantumzone.QZ_Workhub.persistencia.dao.ReservaDAO;
 
+import com.quantumzone.QZ_Workhub.persistencia.mapper.SalaMapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,16 +41,17 @@ public class ReservaService {
     private final ReporteService reporteService;
     private final NotificacionService notificacionService;
     private final UsuarioService usuarioService;
-    private final ReservaService reservaService;
+    private final SalaService salaService;
+
 
     @Autowired
-    public ReservaService(ReservaDAO reservaDAO, RecursoReservadoService recursoReservadoService, ReporteService reporteService, NotificacionService notificacionService, UsuarioService usuarioService, ReservaService reservaService) {
+    public ReservaService(ReservaDAO reservaDAO, @Lazy RecursoReservadoService recursoReservadoService, @Lazy ReporteService reporteService, @Lazy NotificacionService notificacionService, @Lazy UsuarioService usuarioService, @Lazy SalaService salaService ) {
         this.reservaDAO = reservaDAO;
         this.recursoReservadoService = recursoReservadoService;
         this.reporteService = reporteService;
         this.notificacionService = notificacionService;
         this.usuarioService = usuarioService;
-        this.reservaService = reservaService;
+        this.salaService = salaService;
         // Inicializamos algunos datos si es necesario
         initSampleData();
 
@@ -219,8 +222,8 @@ public class ReservaService {
             throw new IllegalArgumentException("El ID de la sala es obligatorio");
         }
 
-        if (reservaService.findById(reservaDto.getIdReserva()) == null) {
-            throw new IllegalArgumentException("Reserva no encontrada");
+        if (salaService.findById(reservaDto.getIdSala()) == null) {
+            throw new IllegalArgumentException("sala no encontrada");
         }
 
         /*
