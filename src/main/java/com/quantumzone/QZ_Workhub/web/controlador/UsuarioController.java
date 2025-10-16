@@ -244,7 +244,7 @@ public class UsuarioController {
                 log.warn("Usuairo no encontrado para eliminar ID: {}", id);
                 return ResponseEntity.notFound().build();
             } else if (e.getMessage().contains("reserva")) {
-                log.warn("Intento de usaurio vendedor con reservas ID: {}", id);
+                log.warn("Intento de usaurio con reservas ID: {}", id);
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             log.error("Error al eliminar usuario ID {}: {}", id, e.getMessage());
