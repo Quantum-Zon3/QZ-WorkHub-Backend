@@ -1,8 +1,11 @@
 package com.quantumzone.QZ_Workhub.unit.service;
 
 import com.quantumzone.QZ_Workhub.dominio.dto.NotificacionDto;
+import com.quantumzone.QZ_Workhub.dominio.dto.ReservaDto;
 import com.quantumzone.QZ_Workhub.dominio.servicio.NotificacionService;
+import com.quantumzone.QZ_Workhub.dominio.servicio.ReservaService;
 import com.quantumzone.QZ_Workhub.persistencia.dao.NotificacionDAO;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Reserva;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +36,9 @@ public class NotificacionServiceTest {
     @Mock
     private Clock clock;
 
+    @Mock
+    private ReservaService reservaService;
+
     //Clase bajo prueba (System under test)
     @InjectMocks
     private NotificacionService notificacionService;
@@ -54,6 +60,7 @@ public class NotificacionServiceTest {
         Instant fixedInstant = Instant.parse("2025-10-08T10:00:00Z");
         when(clock.instant()).thenReturn(fixedInstant);
         when(clock.getZone()).thenReturn(ZoneId.systemDefault());
+
         /**
          * Setteamos los datos de pueba que son necesarios
          */
@@ -70,6 +77,17 @@ public class NotificacionServiceTest {
     @DisplayName("CREATE - Notificacion válido debe retornar notificacion creada con ID")
     void createNotificacion_DeberiaRetornarNotificacionCreada(){
         //ARRANGE (GIVEN) - preparar el escenario
+        ReservaDto reservaSimulada = new ReservaDto();
+        reservaSimulada.setIdReserva(idReservaValida);
+        reservaSimulada.setFechaInicio(LocalDateTime.now(clock));
+        reservaSimulada.setFechaFin(LocalDateTime.now(clock));
+        reservaSimulada.setMontoTotal(10000.0);
+        reservaSimulada.setCantidadVisitantes(5);
+        reservaSimulada.setCedula(12345678L);
+        reservaSimulada.setIdSala(1L);
+        reservaSimulada.setIdPago(1L);
+
+        when(reservaService.findById(idReservaValida)).thenReturn(reservaSimulada);
         // Arrange
         NotificacionDto toCreate = new NotificacionDto();
         toCreate.setMotivo("Carlos Perez");
@@ -82,6 +100,7 @@ public class NotificacionServiceTest {
         persisted.setMotivo(toCreate.getMotivo());
         persisted.setFecha(toCreate.getFecha());
         persisted.setDescripcion(toCreate.getDescripcion());
+        persisted.setIdReserva(toCreate.getIdReserva());
 
         when(notificacionDAO.save(any(NotificacionDto.class))).thenReturn(persisted);
 
@@ -152,13 +171,25 @@ public class NotificacionServiceTest {
     @Test
     @DisplayName("UPDATE - actualiza los campos")
     void updateNotificacion_actualizaLosCampos(){
+        //Preparamos la reserva simulada
+        ReservaDto reservaSimulada = new ReservaDto();
+        reservaSimulada.setIdReserva(idReservaValida);
+        reservaSimulada.setFechaInicio(LocalDateTime.now(clock));
+        reservaSimulada.setFechaFin(LocalDateTime.now(clock));
+        reservaSimulada.setMontoTotal(10000.0);
+        reservaSimulada.setCantidadVisitantes(5);
+        reservaSimulada.setCedula(12345678L);
+        reservaSimulada.setIdSala(1L);
+        reservaSimulada.setIdPago(1L);
+
         // Arange
+
         NotificacionDto existing = new NotificacionDto();
         existing.setIdNotificacion(idNotificacionValida);
         existing.setMotivo("Motivo Viejo");
         existing.setFecha(LocalDateTime.now(clock));
         existing.setDescripcion("Descripcion Vieja");
-        existing.setIdReserva(notificacionValida.getIdReserva());
+        existing.setIdReserva(reservaSimulada.getIdReserva());
 
         NotificacionDto update = new NotificacionDto();
         update.setMotivo("Motivo nuevo");
@@ -181,6 +212,9 @@ public class NotificacionServiceTest {
 
             return Optional.of(passed);
         });
+
+        //Mockeamos reservaSerive para cualquier id => evitamos excepciones con el validarNotifcación
+        when(reservaService.findById(anyLong())).thenReturn(reservaSimulada);
 
         //Act
         NotificacionDto result = notificacionService.updateNotificacion(idNotificacionValida, update);

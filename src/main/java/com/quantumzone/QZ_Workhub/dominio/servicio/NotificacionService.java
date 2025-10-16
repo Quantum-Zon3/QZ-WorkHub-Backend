@@ -53,7 +53,7 @@ public class NotificacionService{
      */
     @Transactional(readOnly = true)
     public NotificacionDto findById(Long id) {
-        log.debug("Buscando notificacion por ID: {}", id);
+        log.info("Buscando notificacion por ID: {}", id);
 
         return notificacionDAO.findById(id)
                 .orElseThrow(() -> {
@@ -94,7 +94,7 @@ public class NotificacionService{
      * Actualizar notificacion con validaciones
      */
     public NotificacionDto updateNotificacion(Long id, NotificacionDto notificacionDto) {
-        log.info("Actualizando producto ID: {}", id);
+        log.info("Actualizando notificación ID: {}", id);
 
         // Verificar que el notificacion existe
         findById(id);
@@ -104,9 +104,9 @@ public class NotificacionService{
 
         // Actualizar
         NotificacionDto updatedProduct = notificacionDAO.update(id, notificacionDto)
-                .orElseThrow(() -> new RuntimeException("Error al actualizar producto"));
+                .orElseThrow(() -> new RuntimeException("Error al actualizar notificación"));
 
-        log.info("Producto actualizado exitosamente ID: {}", id);
+        log.info("Notificación actualizado exitosamente ID: {}", id);
         return updatedProduct;
     }
     /**
@@ -142,7 +142,7 @@ public class NotificacionService{
             throw new IllegalArgumentException("El motivo no puede exceder 200 caracteres");
         }
 
-        if (reservaService.findById(notificacionDto.getIdReserva()) == null ) {
+        if (reservaService.findById(notificacionDto.getIdReserva()).getIdReserva() == null ) {
             throw new IllegalArgumentException("reserva no encontrada");
         }
     }
