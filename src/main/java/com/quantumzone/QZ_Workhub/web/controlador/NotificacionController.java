@@ -44,7 +44,7 @@ public class NotificacionController {
     @GetMapping
     @Operation(
             summary = "Listar todas las notificacion",
-            description = "Obtiene la lista completa de productos con información del notificacion"
+            description = "Obtiene la lista completa de notificaciones"
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -225,9 +225,9 @@ public class NotificacionController {
         log.info("PUT /qzwork_hub/notificaciones{} - Actualizando notificacion", id);
 
         try {
-            NotificacionDto updatedProduct = notificacionService.updateNotificacion(id, updateDTO);
+            NotificacionDto updatedNotificacion = notificacionService.updateNotificacion(id, updateDTO);
             log.info("notifiacion actualizada exitosamente ID: {}", id);
-            return ResponseEntity.ok(updatedProduct);
+            return ResponseEntity.ok(updatedNotificacion);
         } catch (RuntimeException e) {
             if (e.getMessage().contains("no encontrado")) {
                 log.warn("notificacion no encontrada para actualizar ID: {}", id);

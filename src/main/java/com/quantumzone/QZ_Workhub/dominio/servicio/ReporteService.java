@@ -151,18 +151,13 @@ public class ReporteService {
             throw new IllegalArgumentException("El id de la reserva es obligatorio y debe ser un número positivo");
         }
 
-        for (int i = 0; i < reservaService.findAll().size(); i++) {
-            if (!reporteDto.getIdReserva().equals(reservaService.findAll().get(i).getIdReserva())) {
-                throw new IllegalArgumentException("No se encotro la reserva");
-            }
+        if (reservaService.findById(reporteDto.getIdReserva()) == null ) {
+            throw new IllegalArgumentException("El id de la reserva no existe");
         }
 
-        for (int i = 0; i < usuarioService.findAll().size(); i++) {
-            if (!reporteDto.getCedula().equals(reservaService.findAll().get(i).getCedula())) {
-                throw new IllegalArgumentException("No se encotro la usuario");
-            }
+        if (usuarioService.findById(reporteDto.getCedula()) == null) {
+            throw new IllegalArgumentException("El cedula no existe");
         }
-
     }
 
 }

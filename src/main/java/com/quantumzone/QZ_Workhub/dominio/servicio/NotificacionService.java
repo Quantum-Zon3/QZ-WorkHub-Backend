@@ -137,10 +137,8 @@ public class NotificacionService{
             throw new IllegalArgumentException("El motivo no puede exceder 200 caracteres");
         }
 
-        for (int i = 0; i < reservaService.findAll().size(); i++) {
-            if (!notificacionDto.getIdReserva().equals(reservaService.findAll().get(i).getIdReserva())) {
-                throw new IllegalArgumentException("No se encotro la reserva");
-            }
+        if (reservaService.findById(notificacionDto.getIdReserva()) == null ) {
+            throw new IllegalArgumentException("reserva no encontrada");
         }
     }
 
