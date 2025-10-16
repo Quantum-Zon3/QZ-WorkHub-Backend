@@ -1,9 +1,11 @@
 package com.quantumzone.QZ_Workhub.unit.service;
 
 import com.quantumzone.QZ_Workhub.dominio.dto.PagoDto;
+import com.quantumzone.QZ_Workhub.dominio.dto.ReservaDto;
 import com.quantumzone.QZ_Workhub.dominio.enums.EstadoPago;
 import com.quantumzone.QZ_Workhub.dominio.enums.MetodoPago;
 import com.quantumzone.QZ_Workhub.dominio.servicio.PagoService;
+import com.quantumzone.QZ_Workhub.dominio.servicio.ReservaService;
 import com.quantumzone.QZ_Workhub.persistencia.dao.PagoDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,17 +37,20 @@ public class PagoServiceTest {
     @Mock
     private Clock clock;
 
+    @Mock
+    private ReservaService reservaService;
+
     @InjectMocks
     private PagoService pagoService;
 
     private PagoDto pagoValido;
     private Long idPagoValido;
-    private Long idReserva;
+    private Long idReservaValida;
 
     @BeforeEach
     void setUp() {
         idPagoValido = 1L;
-        idReserva = 1L;
+        idReservaValida = 1L;
         pagoValido = new PagoDto();
 
         Instant fixedInstant = Instant.parse("2025-10-08T10:00:00Z");
@@ -57,19 +62,31 @@ public class PagoServiceTest {
         pagoValido.setFechaRealizacion(LocalDateTime.now(clock));
         pagoValido.setEstadoPago(EstadoPago.COMPLETADO);
         pagoValido.setMetodoPago(MetodoPago.PAYPAL);
-        pagoValido.setIdReserva(idReserva);
+        pagoValido.setIdReserva(idReservaValida);
     }
         @Test
         @DisplayName("CREATE - Pago válido debe retornar pago creado exitosamente")
         void createPago_DeberiaRetornarPagoCreado(){
             //ARRANGE (GIVEN) - preparar el escenario
+            ReservaDto reservaSimulada = new ReservaDto();
+            reservaSimulada.setIdReserva(idReservaValida);
+            reservaSimulada.setFechaInicio(LocalDateTime.now(clock));
+            reservaSimulada.setFechaFin(LocalDateTime.now(clock));
+            reservaSimulada.setMontoTotal(10000.0);
+            reservaSimulada.setCantidadVisitantes(5);
+            reservaSimulada.setCedula(12345678L);
+            reservaSimulada.setIdSala(1L);
+            reservaSimulada.setIdPago(1L);
+
+            when(reservaService.findById(idReservaValida)).thenReturn(reservaSimulada);
+
             // Arrange
             PagoDto toCreate = new PagoDto();
             toCreate.setMonto(20000.0);
             toCreate.setFechaRealizacion(LocalDateTime.now(clock));
             toCreate.setEstadoPago(EstadoPago.COMPLETADO);
             toCreate.setMetodoPago(MetodoPago.PAYPAL);
-            toCreate.setIdReserva(idReserva);
+            toCreate.setIdReserva(idReservaValida);
 
             PagoDto persisted = new PagoDto();
             persisted.setIdPago(idPagoValido);
@@ -77,7 +94,7 @@ public class PagoServiceTest {
             persisted.setFechaRealizacion(toCreate.getFechaRealizacion());
             persisted.setEstadoPago(toCreate.getEstadoPago());
             persisted.setMetodoPago(toCreate.getMetodoPago());
-            persisted.setIdReserva(idReserva);
+            persisted.setIdReserva(idReservaValida);
 
             when(pagoDAO.save(any(PagoDto.class))).thenReturn(persisted);
 
@@ -87,14 +104,14 @@ public class PagoServiceTest {
             // Assert - estado
             assertThat(result).isNotNull();
             assertThat(result.getIdPago()).isEqualTo(idPagoValido);
-            assertThat(result.getIdReserva()).isEqualTo(idReserva);
+            assertThat(result.getIdReserva()).isEqualTo(idReservaValida);
 
             // Assert - comportamiento
             ArgumentCaptor<PagoDto> captor = ArgumentCaptor.forClass(PagoDto.class);
             verify(pagoDAO, times(1)).save(captor.capture());
             PagoDto passed = captor.getValue();
             assertThat(passed.getIdPago()).isNull();
-            assertThat(passed.getIdReserva()).isEqualTo(idReserva);
+            assertThat(passed.getIdReserva()).isEqualTo(idReservaValida);
         }
 
     @Test
@@ -141,6 +158,16 @@ public class PagoServiceTest {
     @Test
     @DisplayName("UPDATE - actualiza los campos")
     void updatePago_actualizaLosCampos(){
+        ReservaDto reservaSimulada = new ReservaDto();
+        reservaSimulada.setIdReserva(idReservaValida);
+        reservaSimulada.setFechaInicio(LocalDateTime.now(clock));
+        reservaSimulada.setFechaFin(LocalDateTime.now(clock));
+        reservaSimulada.setMontoTotal(10000.0);
+        reservaSimulada.setCantidadVisitantes(5);
+        reservaSimulada.setCedula(12345678L);
+        reservaSimulada.setIdSala(1L);
+        reservaSimulada.setIdPago(1L);
+
         //Arrange
         PagoDto existing = new PagoDto();
         existing.setIdPago(idPagoValido);
@@ -174,6 +201,9 @@ public class PagoServiceTest {
             return Optional.of(passed);
         });
 
+        //Mockeamos reservaSerive para cualquier id => evitamos excepciones con el validarNotifcación
+        when(reservaService.findById(anyLong())).thenReturn(reservaSimulada);
+
         //Act
         PagoDto result = pagoService.update(idPagoValido, update);
 
@@ -186,7 +216,7 @@ public class PagoServiceTest {
         ArgumentCaptor<PagoDto> captor = ArgumentCaptor.forClass(PagoDto.class);
         verify(pagoDAO, times(1)).update(eq(idPagoValido), captor.capture());
         PagoDto passed = captor.getValue();
-        assertThat(passed.getIdReserva()).isEqualTo(idReserva);
+        assertThat(passed.getIdReserva()).isEqualTo(idReservaValida);
     }
 
     @Test

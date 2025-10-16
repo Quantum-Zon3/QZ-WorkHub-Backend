@@ -2,6 +2,7 @@ package com.quantumzone.QZ_Workhub.dominio.servicio;
 import com.quantumzone.QZ_Workhub.dominio.dto.PagoDto;
 import com.quantumzone.QZ_Workhub.persistencia.dao.PagoDAO;
 import com.quantumzone.QZ_Workhub.persistencia.dao.ReservaDAO;
+import com.quantumzone.QZ_Workhub.persistencia.entidad.Pago;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -66,7 +67,7 @@ public class PagoService {
      */
     @Transactional(readOnly = true)
     public PagoDto findById(Long id) {
-        log.debug("Buscando pago por ID: {}", id);
+        log.info("Buscando pago por ID: {}", id);
 
         return pagoDAO.findById(id)
                 .orElseThrow(() -> {
@@ -80,8 +81,9 @@ public class PagoService {
      */
     @Transactional(readOnly = true)
     public List<PagoDto> findAll() {
-        log.debug("Obteniendo todos los reporte: {}", pagoDAO.findAll().size());
-        return pagoDAO.findAll();
+        List<PagoDto> pagos = pagoDAO.findAll();
+        log.info("Obteniendo todos los reporte: {}", pagos.size());
+        return pagos;
     }
 
     /**
