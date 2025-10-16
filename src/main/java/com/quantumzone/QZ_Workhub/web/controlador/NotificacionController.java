@@ -54,14 +54,22 @@ public class NotificacionController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = NotificacionDto.class)
                     )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Notificacion no encontrado"
             )
     })
     public ResponseEntity<List<NotificacionDto>> findAll() {
         log.debug("GET /qzwork_hub/notificaciones - Obteniendo todos los notificacion");
+        try{
+            List<NotificacionDto> notificaciones = notificacionService.findAll();
+            log.debug("Se encontraron {} notificaciones", notificaciones.size());
+            return ResponseEntity.ok(notificaciones);
+        }catch(EmptyResultDataAccessException e){
+            return ResponseEntity.notFound().build();
+        }
 
-        List<NotificacionDto> notificaciones = notificacionService.findAll();
-        log.debug("Se encontraron {} notificaciones", notificaciones.size());
-        return ResponseEntity.ok(notificaciones);
     }
 
     /**

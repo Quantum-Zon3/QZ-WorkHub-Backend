@@ -1,6 +1,7 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
 import com.quantumzone.QZ_Workhub.dominio.dto.PagoDto;
 import com.quantumzone.QZ_Workhub.persistencia.dao.PagoDAO;
+import com.quantumzone.QZ_Workhub.persistencia.dao.ReservaDAO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,11 +30,13 @@ import java.util.Optional;
 public class PagoService {
 
     private final PagoDAO pagoDAO;
+    private final ReservaService reservaService;
 
 
     @Autowired
-    public PagoService(PagoDAO pagoDAO) {
+    public PagoService(PagoDAO pagoDAO, ReservaService reservaService) {
         this.pagoDAO = pagoDAO;
+        this.reservaService = reservaService;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -154,5 +157,12 @@ public class PagoService {
         if (pagoDto.getIdReserva() == null || pagoDto.getIdReserva() <= 0) {
             throw new IllegalArgumentException("El id de la reserva es obligatorio y debe ser un número positivo");
         }
+
+        for (int i = 0; i < reservaService.findAll().size(); i++) {
+            if (!pagoDto.getIdReserva().equals(reservaService.findAll().get(i).getIdReserva())) {
+                throw new IllegalArgumentException("No se encotro la reserva");
+            }
+        }
+
     }
 }

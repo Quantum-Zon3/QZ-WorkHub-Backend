@@ -139,14 +139,23 @@ public class RecursoController {
                             mediaType = "application/json",
                             schema = @Schema(implementation = RecursoDto.class)
                     )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuario no encontrado"
             )
+
     })
     public ResponseEntity<List<RecursoDto>> findAll() {
         log.debug("GET /qzwork_hub/recursos - Obteniendo todos los Recursos");
+        try {
+            List<RecursoDto> recursos = recursoService.findAll();
+            log.debug("Se encontraron {} recursos", recursos.size());
+            return ResponseEntity.ok(recursos);
+        }catch (RuntimeException e) {
+            return  ResponseEntity.notFound().build();
+        }
 
-        List<RecursoDto> recursos = recursoService.findAll();
-        log.debug("Se encontraron {} recursos", recursos.size());
-        return ResponseEntity.ok(recursos);
     }
 
     /**

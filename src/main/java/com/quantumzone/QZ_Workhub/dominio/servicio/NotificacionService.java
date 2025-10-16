@@ -16,10 +16,12 @@ import java.util.Optional;
 public class NotificacionService{
 
     private final NotificacionDAO notificacionDAO;
+    private final ReservaService reservaService;
 
     @Autowired
-    public NotificacionService(NotificacionDAO notificacionDAO) {
+    public NotificacionService(NotificacionDAO notificacionDAO, ReservaService reservaService) {
         this.notificacionDAO = notificacionDAO;
+        this.reservaService = reservaService;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -133,6 +135,12 @@ public class NotificacionService{
         // Validar longitud del descripcion
         if (notificacionDto.getDescripcion().length() > 200) {
             throw new IllegalArgumentException("El motivo no puede exceder 200 caracteres");
+        }
+
+        for (int i = 0; i < reservaService.findAll().size(); i++) {
+            if (!notificacionDto.getIdReserva().equals(reservaService.findAll().get(i).getIdReserva())) {
+                throw new IllegalArgumentException("No se encotro la reserva");
+            }
         }
     }
 
