@@ -143,7 +143,7 @@ public class SalaService {
         if(salaDto.getNombre() == null || salaDto.getNombre().trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre es obligatorio");
         }
-        if(salaDto.getNombre().length() < 45) {
+        if(salaDto.getNombre().length() > 45) {
             throw new IllegalArgumentException("El nombre de la sala no puede exceder los 45 caracteres");
         }
 
@@ -161,7 +161,7 @@ public class SalaService {
         if(salaDto.getDescripcion() == null || salaDto.getDescripcion().trim().isEmpty()) {
             throw new IllegalArgumentException("La descripcion es obligatorio");
         }
-        if(salaDto.getDescripcion().length() < 45) {
+        if(salaDto.getDescripcion().length() >  45) {
             throw new IllegalArgumentException("La descripcion no puede exceder los 45 caracteres");
         }
     }

@@ -141,7 +141,7 @@ public class UsuarioService {
         }
 
         // Validaciones de negocio
-        validarUsuario(updateDTO);
+        validarUpdateUsuario(updateDTO);
 
         // Actualizar
         UsuarioDto updatedSeller = usuarioDAO.update(cedula, updateDTO)
@@ -230,6 +230,49 @@ public class UsuarioService {
         }
         if (usuarioDto.getFechaRegistro().isAfter(LocalDateTime.now())) {
             throw new IllegalArgumentException("La fecha de registro no puede ser en el futuro");
+        }
+    }
+
+    private void validarUpdateUsuario(UsuarioDto usuarioDto) {
+        // Validar nombre
+        if (usuarioDto.getNombre() == null || usuarioDto.getNombre().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre del usuario es obligatorio");
+        }
+        if (usuarioDto.getNombre().length() > 45) {
+            throw new IllegalArgumentException("El nombre no puede exceder 45 caracteres");
+        }
+
+        // Validar apellido
+        if (usuarioDto.getApellido() == null || usuarioDto.getApellido().trim().isEmpty()) {
+            throw new IllegalArgumentException("El apellido del usuario es obligatorio");
+        }
+        if (usuarioDto.getApellido().length() > 45) {
+            throw new IllegalArgumentException("El apellido no puede exceder 45 caracteres");
+        }
+
+        // Validar email
+        if (usuarioDto.getEmail() == null || usuarioDto.getEmail().trim().isEmpty()) {
+            throw new IllegalArgumentException("El email del usuario es obligatorio");
+        }
+        if (usuarioDto.getEmail().length() > 45) {
+            throw new IllegalArgumentException("El email no puede exceder 45 caracteres");
+        }
+
+        // Validar rol
+        if (usuarioDto.getRol() == null) {
+            throw new IllegalArgumentException("El rol del usuario es obligatorio");
+        }
+
+        // Validar contraseña
+        if (usuarioDto.getContraseña() == null || usuarioDto.getContraseña().trim().isEmpty()) {
+            throw new IllegalArgumentException("La contraseña es obligatoria");
+        }
+        if (usuarioDto.getContraseña().length() < 8 || usuarioDto.getContraseña().length() > 45) {
+            throw new IllegalArgumentException("La contraseña debe tener entre 8 y 45 caracteres");
+        }
+        // Ejemplo: validar que tenga letras y números
+        if (!usuarioDto.getContraseña().matches("^(?=.*[A-Za-z])(?=.*\\d).+$")) {
+            throw new IllegalArgumentException("La contraseña debe contener al menos una letra y un número");
         }
     }
 
