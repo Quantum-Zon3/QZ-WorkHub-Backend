@@ -89,7 +89,7 @@ public class RecursoService {
             if (recursoReservado.getIdReserva().equals(id)) {
                 log.warn("Intento de eliminar recurso con reserva. ID: {}, reserva: {}",recursoReservado.getIdReserva());
                 throw new IllegalStateException(
-                        String.format("No se puede eliminar el recurso porque tiene %d reservas(s) asociado(s)")
+                        String.format("No se puede eliminar el recurso porque tiene %d reservas(s) asociado(s)", recursoReservados.size())
                 );
             }
         }

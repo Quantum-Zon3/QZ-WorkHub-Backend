@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,13 +32,11 @@ public class RecursoServiceTest {
     private RecursoDAO recursoDAO;
 
     @Mock
-    private RecursoReservadoDAO reservadoDAO;
+    private RecursoReservadoService recursoReservadoService;
 
     @InjectMocks
     private RecursoService recursoService;
-    private RecursoReservadoService recursoReservadoService;
 
-    private RecursoReservadoDto recursoReservadoDtoValido;
     private RecursoDto recursoDtoValido;
     private Long idRecursoValido;
 
@@ -211,12 +210,69 @@ public class RecursoServiceTest {
     }
 
     @Test
+    @DisplayName("UPDATE - ArrojaRuntimeExceptionSiNoExiste")
+    void update_arrojaRuntimeExceptionSiNoExiste(){
+        //Arrange
+        when(recursoDAO.findById(999L)).thenReturn(Optional.empty());
+
+        //Act & Assert
+        assertThatThrownBy(() -> recursoService.update(999L, recursoDtoValido))
+                .isInstanceOf(RuntimeException.class);
+
+        verify(recursoDAO, times(1)).findById(999L);
+        verify(recursoDAO, never()).update(any(), any());
+    }
+
+    @Test
     @DisplayName("DELETE - elimina un recurso")
-    void delete_eliminaUnRecursos(){
+    void delete_eliminaUnRecursos() {
+        // Arrange
         when(recursoDAO.findById(idRecursoValido)).thenReturn(Optional.of(recursoDtoValido));
-        when(reservadoDAO.findAll().contains(recursoDAO.findById(idRecursoValido))).thenThrow(new RuntimeException());
+        when(recursoReservadoService.findAll()).thenReturn(Collections.emptyList());
         when(recursoDAO.delete(idRecursoValido)).thenReturn(true);
 
-        //Act & Assert (no debe lanzar excepciones
+        // Act & Assert
+        assertThatCode(() -> recursoService.delete(idRecursoValido))
+                .doesNotThrowAnyException();
+
+        // Verificaciones
+        verify(recursoDAO, times(1)).findById(idRecursoValido);
+        verify(recursoReservadoService, times(1)).findAll();
+        verify(recursoDAO, times(1)).delete(idRecursoValido);
+    }
+
+    @Test
+    @DisplayName("DELETE - lanza excepción cuando el recurso está reservado")
+    void delete_lanzaExcepcionCuandoTieneReservas() {
+        // Arrange
+        when(recursoDAO.findById(idRecursoValido)).thenReturn(Optional.of(recursoDtoValido));
+
+        RecursoReservadoDto reserva = new RecursoReservadoDto();
+        reserva.setIdReserva(idRecursoValido); // Simula que el recurso está reservado
+        when(recursoReservadoService.findAll()).thenReturn(List.of(reserva));
+
+        // Act & Assert
+        assertThatThrownBy(() -> recursoService.delete(idRecursoValido))
+                .isInstanceOf(IllegalStateException.class);
+
+        // Verificar que NO se llamó a delete()
+        verify(recursoDAO, never()).delete(anyLong());
+        // Verificaciones adicionales
+        verify(recursoDAO, times(1)).findById(idRecursoValido);
+        verify(recursoReservadoService, times(1)).findAll();
+    }
+
+    @Test
+    @DisplayName("DELETE - lanza excepcion si no existe el recurso")
+    void delete_lanzaExcepcionSiNoExiste() {
+        //Arrange
+        when(recursoDAO.findById(999L)).thenReturn(Optional.empty());
+
+        //Act & Assert
+        assertThatThrownBy(() -> recursoService.delete(999L))
+                .isInstanceOf(RuntimeException.class);
+
+        verify(recursoDAO, times(1)).findById(999L);
+        verify(recursoDAO, never()).delete(anyLong());
     }
 }
