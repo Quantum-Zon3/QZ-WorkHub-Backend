@@ -2,7 +2,11 @@ package com.quantumzone.QZ_Workhub.web.controlador;
 //imports de anotacion springboot
 import com.quantumzone.QZ_Workhub.dominio.dto.ReservaDto;
 import com.quantumzone.QZ_Workhub.dominio.servicio.ReservaService;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/qzwork_hub/reservas")
 @Tag(name = "Reserva", description = "Controlador de reservas")
+@Slf4j
 public class ReservaController {
 
     private final ReservaService reservaService;
@@ -33,67 +38,204 @@ public class ReservaController {
         this.reservaService = reservaService;
     }
 
+    /**
+     * Obtener todas las reservas
+     */
     @GetMapping
-    @Operation(summary = "Obtener todas las reservas", description = "Devuelve una lista de todas las reservas registradas.")
+    @Operation(
+            summary = "Listar todas las reservas",
+            description = "Obtiene la lista completa de reservas"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de reservas obtenida con éxito"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de reservas obtenida exitosamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ReservaDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Reserva no encontrada"
+            )
     })
-    public ResponseEntity<List<ReservaDto>> getAllReservas() {
-        return new ResponseEntity<>(reservaService.findAll(), HttpStatus.OK);
+    public ResponseEntity<List<ReservaDto>> findAll() {
+        log.debug("GET /qzwork_hub/reservas - Obteniendo todas las reservas");
+        try{
+            List<ReservaDto> reservas = reservaService.findAll();
+            log.debug("Se encontraron {} reservas", reservas.size());
+            return ResponseEntity.ok(reservas);
+        }catch(EmptyResultDataAccessException e){
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
+
+    /**
+     * Obtener reserva por ID
+     */
     @GetMapping("/{id}")
-    @Operation(summary = "Obtener reserva por ID", description = "Devuelve una reserva específica basada en su ID.")
+    @Operation(
+            summary = "Buscar reserva por ID",
+            description = "Obtiene la información completa de un reserva"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Reserva encontrada"),
-            @ApiResponse(responseCode = "404", description = "Reserva no encontrada")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Reserva encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ReservaDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Reserva no encontrado"
+            )
     })
-    public ResponseEntity<ReservaDto> getReservaById(
-            @PathVariable @Parameter(description = "ID de la reserva") Long id) {
-        try{
-            ReservaDto reserva = reservaService.findById(id);
-            return ResponseEntity.ok(reserva);
-        }catch (RuntimeException e) {
+    public ResponseEntity<ReservaDto> findById(
+            @Parameter(description = "ID del reserva", required = true, example = "1")
+            @PathVariable Long id
+    ) {
+        log.debug("GET /qzwork_hub/reservas/{} - Buscando reservas", id);
+
+        try {
+            ReservaDto pago = reservaService.findById(id);
+            return ResponseEntity.ok(pago);
+        } catch (RuntimeException e) {
+            log.warn("reserva no encontrado con ID: {}", id);
             return ResponseEntity.notFound().build();
         }
     }
 
+    /**
+     * Crear una nueva reserva
+     */
     @PostMapping
-    @Operation(summary = "Crear una nueva reserva", description = "Crea una nueva reserva con los datos proporcionados.")
+    @Operation(
+            summary = "Crear nueva reserva",
+            description = "Crea un nueva reserva"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Reserva creada con éxito"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos")
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Reserva creada exitosamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ReservaDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Datos inválidos",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = String.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Error interno del servidor"
+            )
     })
-    public ResponseEntity<ReservaDto> createReserva(
-            @RequestBody @Parameter(description = "Datos de la reserva a crear") ReservaDto reserva) {
-        ReservaDto nuevaReserva = reservaService.save(reserva);
-        return new ResponseEntity<>(nuevaReserva, HttpStatus.CREATED);
+    public ResponseEntity<ReservaDto> save(
+            @Parameter(description = "Datos del reserva a crear", required = true)
+            @RequestBody ReservaDto createDTO
+    ) {
+        log.info("POST /qzwork_hub/reservas - Creando reserva: {}", createDTO.getIdReserva());
+
+        try {
+            ReservaDto reservaSave = reservaService.save(createDTO);
+            log.info("Reserva creada exitosamente con ID: {}", reservaSave.getIdReserva());
+            return ResponseEntity.status(HttpStatus.CREATED).body(reservaSave);
+        } catch (IllegalArgumentException e) {
+            log.warn("Error de validación al crear reserva: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 
-    @PutMapping
-    @Operation(summary = "Actualizar una reserva", description = "Actualiza los datos de una reserva existente.")
+    /**
+     * Actualizar reserva existente
+     */
+    @PutMapping("/{id}")
+    @Operation(
+            summary = "Actualizar reserva",
+            description = "Actualiza la información de un reserva"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Reserva actualizada con éxito"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos")
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Reserva actualizado exitosamente",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ReservaDto.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Datos inválidos"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Reserva no encontrado"
+            )
     })
-    public ResponseEntity<ReservaDto> updateReserva(
-            @RequestBody @Parameter(description = "id de la reserva") Long id,
-            @RequestBody @Parameter(description = "Datos actualizados de la reserva") ReservaDto reserva) {
-        ReservaDto updatedReserva = reservaService.update(id, reserva);
-        return new ResponseEntity<>(updatedReserva, HttpStatus.OK);
+    public ResponseEntity<ReservaDto> update(
+            @Parameter(description = "ID del reserva a actualizar", required = true, example = "1")
+            @PathVariable Long id,
+            @Parameter(description = "Datos a actualizar del reserva", required = true)
+            @RequestBody ReservaDto updateDTO
+    ) {
+        log.info("PUT /qzwork_hub/reservas/{} - Actualizando reserva", id);
+
+        try {
+            ReservaDto updatedReserva = reservaService.update(id, updateDTO);
+            log.info("reserva actualizada exitosamente ID: {}", id);
+            return ResponseEntity.ok(updatedReserva);
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("no encontrado")) {
+                log.warn("Reserva no encontrada para actualizar ID: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+            log.warn("Error al actualizar reserva ID {}: {}", id, e.getMessage());
+            return ResponseEntity.badRequest().build();
+        }
     }
 
+    /**
+     * Eliminar reserva
+     */
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar una reserva", description = "Elimina una reserva basada en su ID.")
+    @Operation(
+            summary = "Eliminar reserva",
+            description = "Elimina una reserva del sistema"
+    )
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Reserva eliminada con éxito"),
-            @ApiResponse(responseCode = "404", description = "Reserva no encontrada")
+            @ApiResponse(
+                    responseCode = "204",
+                    description = "Reserva eliminada exitosamente"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Reserva no encontrada"
+            )
     })
-    public ResponseEntity<Void> deleteReserva(
-            @PathVariable @Parameter(description = "ID de la reserva") Long id) {
-        reservaService.deleteReserva(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "ID del reserva a eliminar", required = true, example = "1")
+            @PathVariable Long id
+    ) {
+        log.info("DELETE /qzwork_hub/reserva/{} - Eliminando reserva", id);
+
+        try {
+            reservaService.deleteReserva(id);
+            log.info("Reserva eliminado exitosamente ID: {}", id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            log.warn("Reserva no encontrado para eliminar ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
     }
     /*
     @GetMapping("/buscar")

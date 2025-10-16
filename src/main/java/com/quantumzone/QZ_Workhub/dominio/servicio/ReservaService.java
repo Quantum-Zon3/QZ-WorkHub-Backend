@@ -38,15 +38,20 @@ public class ReservaService {
     private final RecursoReservadoService recursoReservadoService;
     private final ReporteService reporteService;
     private final NotificacionService notificacionService;
+    private final UsuarioService usuarioService;
+    private final ReservaService reservaService;
 
     @Autowired
-    public ReservaService(ReservaDAO reservaDAO, RecursoReservadoService recursoReservadoService, ReporteService reporteService, NotificacionService notificacionService) {
+    public ReservaService(ReservaDAO reservaDAO, RecursoReservadoService recursoReservadoService, ReporteService reporteService, NotificacionService notificacionService, UsuarioService usuarioService, ReservaService reservaService) {
         this.reservaDAO = reservaDAO;
         this.recursoReservadoService = recursoReservadoService;
         this.reporteService = reporteService;
         this.notificacionService = notificacionService;
+        this.usuarioService = usuarioService;
+        this.reservaService = reservaService;
         // Inicializamos algunos datos si es necesario
         initSampleData();
+
     }
 
     private void initSampleData() {
@@ -204,14 +209,27 @@ public class ReservaService {
         if (reservaDto.getCedula() == null || reservaDto.getCedula() <= 0) {
             throw new IllegalArgumentException("La cédula es obligatoria");
         }
+
+        if(usuarioService.findById(reservaDto.getIdReserva()) == null){
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
+
         //validar id sala
         if (reservaDto.getIdSala() == null || reservaDto.getIdSala() <= 0) {
             throw new IllegalArgumentException("El ID de la sala es obligatorio");
         }
+
+        if (reservaService.findById(reservaDto.getIdReserva()) == null) {
+            throw new IllegalArgumentException("Reserva no encontrada");
+        }
+
+        /*
         //validar id pago
         if (reservaDto.getIdPago() == null || reservaDto.getIdPago() <= 0) {
             throw new IllegalArgumentException("El ID del pago es obligatorio");
         }
+        */
+
     }    
 }
 

@@ -158,11 +158,8 @@ public class PagoService {
             throw new IllegalArgumentException("El id de la reserva es obligatorio y debe ser un número positivo");
         }
 
-        for (int i = 0; i < reservaService.findAll().size(); i++) {
-            if (!pagoDto.getIdReserva().equals(reservaService.findAll().get(i).getIdReserva())) {
-                throw new IllegalArgumentException("No se encotro la reserva");
-            }
+        if (reservaService.findById(pagoDto.getIdReserva()) == null ) {
+            throw new IllegalArgumentException("El id de la reserva no existe");
         }
-
     }
 }
