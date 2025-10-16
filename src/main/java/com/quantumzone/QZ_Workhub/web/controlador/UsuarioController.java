@@ -191,7 +191,7 @@ public class UsuarioController {
             @Parameter(description = "Datos a actualizar del usuario", required = true)
             @RequestBody UsuarioDto updateDTO
     ) {
-        log.info("PUT /api/v1/sellers/{} - Actualizando usuario", id);
+        log.info("PUT /qzwork_hub/usuarios/{} - Actualizando usuario", id);
 
         try {
             UsuarioDto usuarioActualizado = usuarioService.update(id, updateDTO);
@@ -233,7 +233,7 @@ public class UsuarioController {
             @Parameter(description = "ID del usuario a eliminar", required = true, example = "1")
             @PathVariable Long id
     ) {
-        log.info("DELETE /qzwork_hub/usuarios{} - Eliminando usuario", id);
+        log.info("DELETE /qzwork_hub/usuarios/{} - Eliminando usuario", id);
 
         try {
             usuarioService.deleteUsuario(id);
