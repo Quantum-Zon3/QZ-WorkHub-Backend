@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,12 +34,14 @@ public class RecursoReservadoService {
     private final RecursoReservadoDAO recursoRDao;
     private final ReservaService reservaService;
     private final RecursoService recursoService;
+    private final Clock clock;
 
     @Autowired
-    public RecursoReservadoService(RecursoReservadoDAO recursoRDao, @Lazy ReservaService reservaService,@Lazy RecursoService recursoService) {
+    public RecursoReservadoService(RecursoReservadoDAO recursoRDao, @Lazy ReservaService reservaService,@Lazy RecursoService recursoService, Clock clock) {
         this.recursoRDao = recursoRDao;
         this.reservaService = reservaService;
         this.recursoService = recursoService;
+        this.clock = clock;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -110,22 +113,22 @@ public class RecursoReservadoService {
     }
 
     private void validarRecursoR(RecursoReservadoDto recursoRDto) {
-
+        LocalDateTime now = LocalDateTime.now(clock);
         // Validar id de recurso
         if (recursoRDto.getIdRecurso() == null || recursoRDto.getIdRecurso() == 0) {
             throw new IllegalArgumentException("El id del recurso solicitado es obligatorio");
         }
 
-        if (recursoService.findById(recursoRDto.getId()) == null) {
-            throw new IllegalArgumentException("Reser no encontrada");
+        if (recursoService.findById(recursoRDto.getIdRecurso()) == null) {
+            throw new IllegalArgumentException("Recurso no encontrado");
         }
 
         // Validar id de reserva
         if (recursoRDto.getIdReserva() == null || recursoRDto.getIdReserva() == 0) {
-            throw new IllegalArgumentException("El id de la reserva es obligatio");
+            throw   new IllegalArgumentException("El id de la reserva es obligatio");
         }
 
-        if(reservaService.findById(recursoRDto.getIdReserva()) == null) {
+        if(reservaService.findById(recursoRDto.getIdReserva()).getIdReserva() == null) {
             throw new IllegalArgumentException("Reserva no encontrada");
         }
 
@@ -139,7 +142,7 @@ public class RecursoReservadoService {
         if (recursoRDto.getFechaInicio() == null) {
             throw new IllegalArgumentException("La fecha de inicio es obligatoria");
         }
-        if (recursoRDto.getFechaInicio().isAfter(LocalDateTime.now())) {
+        if (recursoRDto.getFechaInicio().isAfter(now)) {
             throw new IllegalArgumentException("La fecha de inicio no puede ser en el futuro");
         }
 
@@ -147,7 +150,7 @@ public class RecursoReservadoService {
         if (recursoRDto.getFechaFin() == null) {
             throw new IllegalArgumentException("La fecha de finalizacion es obligatoria");
         }
-        if (recursoRDto.getFechaFin().isAfter(LocalDateTime.now())) {
+        if (recursoRDto.getFechaFin().isAfter(now)) {
             throw new IllegalArgumentException("La fecha de finalizacion no puede ser en el futuro");
         }
 
