@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 /**
@@ -34,12 +35,14 @@ public class UsuarioService {
     private final UsuarioDAO usuarioDAO;
     private final ReservaService reservaService;
     private final ReporteService reporteService;
+    private final Clock clock;
 
     @Autowired
-    public UsuarioService(UsuarioDAO usuarioDAO, ReservaService reservaService, @Lazy ReporteService reporteService) {
+    public UsuarioService(UsuarioDAO usuarioDAO, ReservaService reservaService, @Lazy ReporteService reporteService, Clock clock) {
         this.usuarioDAO = usuarioDAO;
         this.reservaService = reservaService;
         this.reporteService = reporteService;
+        this.clock = clock;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -73,7 +76,7 @@ public class UsuarioService {
      */
     @Transactional(readOnly = true)
     public UsuarioDto findById(Long cedula) {
-        log.debug("Buscando usuario por ID: {}", cedula);
+        log.info("Buscando usuario por ID: {}", cedula);
 
         return usuarioDAO.findById(cedula)
                 .orElseThrow(() -> {
@@ -87,7 +90,7 @@ public class UsuarioService {
      */
     @Transactional(readOnly = true)
     public List<UsuarioDto> findAll() {
-        log.debug("Obteniendo todos los usuario");
+        log.info("Obteniendo todos los usuario");
         return usuarioDAO.findAll();
     }
 
@@ -105,7 +108,7 @@ public class UsuarioService {
             if (reserva.getCedula().equals(cedula)) {
                 log.warn("Intento de eliminar usuario con reserva. ID: {}, reserva: {}",reserva.getIdReserva());
                 throw new IllegalStateException(
-                        String.format("No se puede eliminar el usuario porque tiene %d reservas(s) asociado(s)")
+                        String.format("No se puede eliminar el usuario porque tiene %d reservas(s) asociado(s)", reservas.size())
                 );
             }
         }
@@ -113,9 +116,9 @@ public class UsuarioService {
         List<ReporteDto> reportes = reporteService.findAll();
         for (ReporteDto reporte : reportes) {
             if (reporte.getCedula().equals(cedula)) {
-                log.warn("Intento de eliminar usuario con reserva. ID: {}, reserva: {}",reporte.getIdReserva());
+                log.warn("Intento de eliminar usuario con reportes. ID: {}, reserva: {}",reporte.getIdReserva());
                 throw new IllegalStateException(
-                        String.format("No se puede eliminar el usuario porque tiene %d reservas(s) asociado(s)")
+                        String.format("No se puede eliminar el usuario porque tiene %d reportes(s) asociado(s)", reportes.size())
                 );
             }
         }
@@ -155,6 +158,7 @@ public class UsuarioService {
      * METODO PRIVADO: Validar datos de creación
      */
     private void validarUsuario(UsuarioDto usuarioDto) {
+        LocalDateTime ahora = LocalDateTime.now(clock);
         // Validar cédula
         if (usuarioDto.getCedula() == null || usuarioDto.getCedula() <= 0) {
             throw new IllegalArgumentException("La cédula es obligatoria y debe ser un número positivo");
@@ -220,6 +224,7 @@ public class UsuarioService {
                 throw new IllegalArgumentException("El cedula es ya esta registrado");
             }
             if (findAll().get(i).getEmail().equals(usuarioDto.getEmail())) {
+                log.info("El email ya esta registrado");
                 throw new IllegalArgumentException("El email es ya esta registrado");
             }
         }
@@ -228,7 +233,7 @@ public class UsuarioService {
         if (usuarioDto.getFechaRegistro() == null) {
             throw new IllegalArgumentException("La fecha de registro es obligatoria");
         }
-        if (usuarioDto.getFechaRegistro().isAfter(LocalDateTime.now())) {
+        if (usuarioDto.getFechaRegistro().isAfter(ahora)) {
             throw new IllegalArgumentException("La fecha de registro no puede ser en el futuro");
         }
     }
