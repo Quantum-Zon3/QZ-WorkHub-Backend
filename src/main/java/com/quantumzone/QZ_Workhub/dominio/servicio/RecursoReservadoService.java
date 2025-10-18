@@ -75,8 +75,9 @@ public class RecursoReservadoService {
     // Listar todos los recursos
     @Transactional(readOnly = true)
     public List<RecursoReservadoDto> findAll() {
-        log.debug("Obteniendo todos los recursos reservado: {}", recursoRDao.findAll().size());
-        return recursoRDao.findAll();
+        List<RecursoReservadoDto> recursosR = recursoRDao.findAll();
+        log.info("Obteniendo todos los recursos reservado: {}", recursosR.size());
+        return recursosR;
     }
 
     // Eliminar un recurso reservado por id
