@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,12 +36,14 @@ public class RecursoReservadoService {
     private final RecursoReservadoDAO recursoRDao;
     private final ReservaService reservaService;
     private final RecursoService recursoService;
+    private final Clock clock;
 
     @Autowired
-    public RecursoReservadoService(RecursoReservadoDAO recursoRDao, @Lazy ReservaService reservaService,@Lazy RecursoService recursoService) {
+    public RecursoReservadoService(RecursoReservadoDAO recursoRDao, @Lazy ReservaService reservaService,@Lazy RecursoService recursoService, Clock clock) {
         this.recursoRDao = recursoRDao;
         this.reservaService = reservaService;
         this.recursoService = recursoService;
+        this.clock = clock;
         // Inicializamos algunos datos si es necesario
         initSampleData();
     }
@@ -74,8 +77,9 @@ public class RecursoReservadoService {
     // Listar todos los recursos
     @Transactional(readOnly = true)
     public List<RecursoReservadoDto> findAll() {
-        log.debug("Obteniendo todos los recursos reservado: {}", recursoRDao.findAll().size());
-        return recursoRDao.findAll();
+        List<RecursoReservadoDto> recursosR = recursoRDao.findAll();
+        log.info("Obteniendo todos los recursos reservado: {}", recursosR.size());
+        return recursosR;
     }
 
     // Eliminar un recurso reservado por id
@@ -113,7 +117,7 @@ public class RecursoReservadoService {
 
 
     private void validarRecursoR(RecursoReservadoDto recursoRDto) {
-
+        LocalDateTime now = LocalDateTime.now(clock);
         // Validar id de recurso
         if (recursoRDto.getIdRecurso() == null || recursoRDto.getIdRecurso() == 0) {
             throw new IllegalArgumentException("El id del recurso solicitado es obligatorio");
@@ -143,7 +147,7 @@ public class RecursoReservadoService {
         if (recursoRDto.getFechaInicio() == null) {
             throw new IllegalArgumentException("La fecha de inicio es obligatoria");
         }
-        if (recursoRDto.getFechaInicio().isAfter(LocalDateTime.now())) {
+        if (recursoRDto.getFechaInicio().isAfter(now)) {
             throw new IllegalArgumentException("La fecha de inicio no puede ser en el futuro");
         }
 

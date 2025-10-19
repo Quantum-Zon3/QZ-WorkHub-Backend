@@ -62,7 +62,7 @@ public class SalaService {
      */
     @Transactional(readOnly = true)
     public SalaDto findById(Long id){
-        log.debug("Buscando sala con ID: {}", id);
+        log.info("Buscando sala con ID: {}", id);
 
         return salaDAO.findById(id)
                 .orElseThrow(() -> {
@@ -76,7 +76,7 @@ public class SalaService {
      */
     @Transactional(readOnly = true)
     public List<SalaDto> findAll(){
-        log.debug("Buscando salas");
+        log.info( "Buscando salas");
         return salaDAO.findAll();
     }
 
@@ -94,7 +94,9 @@ public class SalaService {
         for (ReservaDto reserva : reservas) {
             if (reserva.getIdReserva().equals(id)) {
                 log.warn("Intento de eliminar usuario con reserva. ID: {}, reserva: {}",reserva.getIdReserva());
-                throw new RuntimeException("No se puede eliminar sala con reserva: " + reserva.getIdReserva());
+                throw new IllegalStateException(
+                        String.format("No se puede eliminar el usuario porque tiene %d reservas(s) asociado(s)", id)
+                );
             }
         }
          // Eliminar sala
