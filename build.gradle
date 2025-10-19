@@ -2,6 +2,9 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.5.5'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
+	id 'io.qameta.allure' version '2.11.2'
+	id 'org.sonarqube' version '4.4.1.3373'
 }
 
 group = 'com.quantumzone'
@@ -25,35 +28,96 @@ repositories {
 }
 
 dependencies {
-		implementation 'org.springframework.boot:spring-boot-starter-web'
-		implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-		implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-		implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
-		implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+	implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 
-		runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 
-		compileOnly 'org.projectlombok:lombok'
-		annotationProcessor 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 
-		// MapStruct para mapeo automático
-		implementation 'org.mapstruct:mapstruct:1.6.3'
-		annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
-		// Para usar MapStruct con Lombok
-		annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	implementation 'org.mapstruct:mapstruct:1.6.3'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
 
-		// Testing dependencies
-		testImplementation 'org.springframework.boot:spring-boot-starter-test'
-		testImplementation 'org.mockito:mockito-inline:5.2.0'
-		testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.mockito:mockito-inline:5.2.0'
+	testImplementation 'com.h2database:h2:2.2.224'
+	testImplementation 'org.mockito:mockito-junit-jupiter:5.2.0'
+	testImplementation 'io.qameta.allure:allure-junit5:2.24.0'
+	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
 
-	test {
-			useJUnitPlatform() // Requerido para JUnit 5
-			jvmArgs '-XX:+EnableDynamicAgentLoading'
-	}
+test {
+	useJUnitPlatform() // Requerido para JUnit 5
+	jvmArgs '-XX:+EnableDynamicAgentLoading'
+	systemProperty "spring.profiles.active", "test"
+}
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy 'jacocoTestReport'
+}
+
+jacoco {
+	toolVersion = "0.8.10"
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
+	}
+	finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.30
+			}
+		}
+	}
+}
+
+tasks.named('jacocoTestReport') {
+	finalizedBy 'allureReport'
+}
+
+allure {
+	version = "2.24.0"
+	autoconfigure = true
+	aspectjweaver = true
+}
+
+
+sonarqube {
+	properties {
+		property "sonar.projectKey", "ExpooCode-Project"
+		property "sonar.projectName", "ExpooCode"
+		property "sonar.host.url", "http://localhost:9000/"
+		property "sonar.login", "sqp_c6a080fb6621552815142142a8088e46050ef5c7"
+		property "sonar.sources", "src/main/java"
+		property "sonar.tests", "src/test/java"
+		property "sonar.java.binaries", "build/classes/java/main"
+		property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/jacocoTestReport.xml"
+		property "sonar.gradle.skipCompile", "true"
+	}
+}
+
+tasks.register('openAllureReport') {
+	dependsOn allureReport
+	doLast {
+		Desktop.getDesktop().browse(new File("$buildDir/reports/allure-report/index.html").toURI())
+	}
+}
+tasks.test {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport, allureReport
 }
