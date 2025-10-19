@@ -202,7 +202,7 @@ public class RecursoReservadoServiceTest {
 
         RecursoReservadoDto existing = new RecursoReservadoDto();
         existing.setId(idRecursoRValido);
-        existing.setCantidad(2L);
+        existing.setCantidad(4L);
         existing.setFechaInicio(LocalDateTime.now(clock));
         existing.setFechaFin(LocalDateTime.now(clock));
         existing.setMontoTotal(4000);
@@ -210,7 +210,7 @@ public class RecursoReservadoServiceTest {
         existing.setIdReserva(reservaSimulada.getIdReserva());
 
         RecursoReservadoDto update = new RecursoReservadoDto();
-        update.setCantidad(4L);
+        update.setCantidad(2L);
         update.setFechaInicio(LocalDateTime.now(clock));
         update.setFechaFin(LocalDateTime.now(clock));
         update.setMontoTotal(6000);
@@ -219,7 +219,7 @@ public class RecursoReservadoServiceTest {
 
         RecursoReservadoDto updated = new RecursoReservadoDto();
         updated.setId(idRecursoRValido);
-        updated.setCantidad(4L);
+        updated.setCantidad(2L);
         updated.setFechaInicio(LocalDateTime.now(clock));
         updated.setFechaFin(LocalDateTime.now(clock));
         updated.setMontoTotal(6000);
@@ -245,7 +245,7 @@ public class RecursoReservadoServiceTest {
 
         //Assert - estado
         assertThat(result).isNotNull();
-        assertThat(result.getCantidad()).isEqualTo(4L);
+        assertThat(result.getCantidad()).isEqualTo(2L);
         assertThat(result.getIdRecurso()).isEqualTo(existing.getIdRecurso());
         assertThat(result.getIdReserva()).isEqualTo(existing.getIdReserva());
 

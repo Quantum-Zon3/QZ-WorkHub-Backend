@@ -69,7 +69,7 @@ public class PagoServiceTest {
         void createPago_DeberiaRetornarPagoCreado(){
             //ARRANGE (GIVEN) - preparar el escenario
             ReservaDto reservaSimulada = new ReservaDto();
-            reservaSimulada.setIdReserva(idReservaValida);
+            reservaSimulada.setIdReserva(null);
             reservaSimulada.setFechaInicio(LocalDateTime.now(clock));
             reservaSimulada.setFechaFin(LocalDateTime.now(clock));
             reservaSimulada.setMontoTotal(10000.0);

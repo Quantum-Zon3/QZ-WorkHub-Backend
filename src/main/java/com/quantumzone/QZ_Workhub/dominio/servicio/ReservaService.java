@@ -1,4 +1,5 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -44,16 +45,18 @@ public class ReservaService {
     private final NotificacionService notificacionService;
     private final UsuarioService usuarioService;
     private final SalaService salaService;
+    private final Clock clock;
 
 
     @Autowired
-    public ReservaService(ReservaDAO reservaDAO, @Lazy RecursoReservadoService recursoReservadoService, @Lazy ReporteService reporteService, @Lazy NotificacionService notificacionService, @Lazy UsuarioService usuarioService, @Lazy SalaService salaService ) {
+    public ReservaService(ReservaDAO reservaDAO, @Lazy RecursoReservadoService recursoReservadoService, @Lazy ReporteService reporteService, @Lazy NotificacionService notificacionService, @Lazy UsuarioService usuarioService, @Lazy SalaService salaService, Clock clock ) {
         this.reservaDAO = reservaDAO;
         this.recursoReservadoService = recursoReservadoService;
         this.reporteService = reporteService;
         this.notificacionService = notificacionService;
         this.usuarioService = usuarioService;
         this.salaService = salaService;
+        this.clock = clock;
         // Inicializamos algunos datos si es necesario
         initSampleData();
 
@@ -133,7 +136,7 @@ public class ReservaService {
         List<NotificacionDto> notificaciones = notificacionService.findAll();
         for (NotificacionDto notificacionDto : notificaciones) {
             if (notificacionDto.getIdReserva().equals(id)) {
-                log.warn("Intento de eliminar recurso con reserva. ID: {}, reserva: {}",notificacionDto.getIdReserva());
+                log.warn("Intento de eliminar reserva con notificaciones. ID: {}, reserva: {}",notificacionDto.getIdReserva());
                 throw new RuntimeException(
                         String.format("No se puede eliminar el recurso porque tiene notificaciones asociados")
                 );
@@ -172,13 +175,14 @@ public class ReservaService {
      * Validar los datos para crear y/o actualizar la reserva
      */
     private void validarReserva(ReservaDto reservaDto) {
+        LocalDateTime ahora = LocalDateTime.now(clock);
         // ===== VALIDAR FECHA DE INICIO =====
         if (reservaDto.getFechaInicio() == null) {
             throw new IllegalArgumentException("La fecha de inicio es obligatoria.");
         }
 
 // No permitir fechas pasadas
-        if (reservaDto.getFechaInicio().isBefore(LocalDateTime.now())) {
+        if (reservaDto.getFechaInicio().isBefore(ahora)) {
             throw new IllegalArgumentException("La fecha de inicio no puede estar en el pasado.");
         }
 
@@ -231,7 +235,7 @@ public class ReservaService {
             throw new IllegalArgumentException("Ya existe una reserva en ese horario para la sala seleccionada.");
         }
 
-        if(reservaDto.getCantidadVisitantes() > salaService.findById(reservaDto.getIdReserva()).getCapacidad()){
+        if(reservaDto.getCantidadVisitantes() > salaService.findById(reservaDto.getIdSala()).getCapacidad()){
             throw new IllegalArgumentException("La reserva excede la cantidad de visitantes para la sala seleccionada.");
         }
 
@@ -276,6 +280,7 @@ public class ReservaService {
      */
     private void validarReservaParaUpdate(ReservaDto reservaDto) {
         // ===== VALIDAR ID DE RESERVA =====
+        LocalDateTime ahora = LocalDateTime.now(clock);
         if (reservaDto.getIdReserva() == null || reservaDto.getIdReserva() <= 0) {
             throw new IllegalArgumentException("El ID de la reserva es obligatorio para actualizar.");
         }
@@ -300,7 +305,7 @@ public class ReservaService {
         }
 
         // Si las fechas fueron modificadas, validar que no estén en el pasado
-        if (reservaDto.getFechaInicio().isBefore(LocalDateTime.now())) {
+        if (reservaDto.getFechaInicio().isBefore(ahora)) {
             throw new IllegalArgumentException("La fecha de inicio no puede estar en el pasado.");
         }
 
