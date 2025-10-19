@@ -105,7 +105,7 @@ public class UsuarioService {
             if (reserva.getCedula().equals(cedula)) {
                 log.warn("Intento de eliminar usuario con reserva. ID: {}, reserva: {}",reserva.getIdReserva());
                 throw new IllegalStateException(
-                        String.format("No se puede eliminar el usuario porque tiene %d reservas(s) asociado(s)")
+                        String.format("No se puede eliminar el usuario porque tiene %d reservas(s) asociados")
                 );
             }
         }
@@ -115,7 +115,7 @@ public class UsuarioService {
             if (reporte.getCedula().equals(cedula)) {
                 log.warn("Intento de eliminar usuario con reserva. ID: {}, reserva: {}",reporte.getIdReserva());
                 throw new IllegalStateException(
-                        String.format("No se puede eliminar el usuario porque tiene %d reservas(s) asociado(s)")
+                        String.format("No se puede eliminar el usuario porque tiene %d reservas(s) asociados")
                 );
             }
         }
