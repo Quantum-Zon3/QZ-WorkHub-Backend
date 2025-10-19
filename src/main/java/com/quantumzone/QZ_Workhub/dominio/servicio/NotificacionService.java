@@ -57,7 +57,7 @@ public class NotificacionService{
 
         return notificacionDAO.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("Notificacion no encontrada con ID: {}", id);
+                    log.warn("Notificacion no encontrado con ID: {}", id);
                     return new RuntimeException("Notificacion no encontrada con ID: " + id);
                 });
     }

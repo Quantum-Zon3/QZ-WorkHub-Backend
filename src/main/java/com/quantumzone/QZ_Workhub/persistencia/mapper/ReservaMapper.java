@@ -66,7 +66,7 @@ public interface ReservaMapper {
     @Mapping(target = "cantidadVisitantes", source = "cantidadVisitantes")
     @Mapping(target = "usuario", source = "cedula",qualifiedByName = "createUsuarioFromId")
     @Mapping(target = "sala", source = "idSala", qualifiedByName = "createSalaFromId")
-    @Mapping(target = "pago", source = "idPago", qualifiedByName = "createPagoFromId")
+    @Mapping(target = "pago", ignore = true)
     @Mapping(target = "idReserva", ignore = true)
     @Mapping(target = "notificaciones", ignore = true)
     @Mapping(target = "reportes", ignore = true)

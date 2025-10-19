@@ -234,7 +234,7 @@ public class SalaController {
             log.info("Sala eliminado exitosamente ID: {}", id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
-            if (e.getMessage().contains("no encontrado")) {
+            if (e.getMessage() != null && e.getMessage().contains("No encontro")) {
                 log.warn("Sala no encontrado para eliminar ID: {}", id);
                 return ResponseEntity.notFound().build();
             } else if (e.getMessage().contains("reserva")) {

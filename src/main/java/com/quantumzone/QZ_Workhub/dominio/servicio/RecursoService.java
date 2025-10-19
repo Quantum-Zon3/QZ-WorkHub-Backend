@@ -63,8 +63,8 @@ public class RecursoService {
         log.info("Buscando recurso con id: {}", id);
 
         return recursoDao.findById(id).orElseThrow(() -> {
-            log.warn("recurso no encontrada con ID: {}", id);
-            return new RuntimeException("recurso no encontrada con ID: " + id);
+            log.warn("recurso no encontrado con ID: {}", id);
+            return new RuntimeException("recurso no encontrado con ID: " + id);
         });
     }
 

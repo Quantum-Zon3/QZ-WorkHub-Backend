@@ -66,8 +66,8 @@ public class SalaService {
 
         return salaDAO.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("No se encontro la sala con ID: {}", id);
-                    return new RuntimeException("No se encontro la sala con ID: " + id);
+                    log.warn("No encontro la sala con ID: {}", id);
+                    return new RuntimeException("No encontro la sala con ID: " + id);
                 });
     }
 
@@ -94,9 +94,7 @@ public class SalaService {
         for (ReservaDto reserva : reservas) {
             if (reserva.getIdReserva().equals(id)) {
                 log.warn("Intento de eliminar usuario con reserva. ID: {}, reserva: {}",reserva.getIdReserva());
-                throw new IllegalStateException(
-                        String.format("No se puede eliminar el usuario porque tiene %d reservas(s) asociado(s)")
-                );
+                throw new RuntimeException("No se puede eliminar sala con reserva: " + reserva.getIdReserva());
             }
         }
          // Eliminar sala

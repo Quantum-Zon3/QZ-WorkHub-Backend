@@ -8,6 +8,7 @@ import com.quantumzone.QZ_Workhub.persistencia.repositorio.ReservaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,4 +56,23 @@ public class ReservaDAO {
         }
         return false;
     }
+
+    /**
+     * ✅ Verifica si existe un conflicto de reserva en la misma sala y franja horaria.
+     * @param idSala ID de la sala.
+     * @param fechaInicio Fecha/hora de inicio propuesta.
+     * @param fechaFin Fecha/hora de fin propuesta.
+     * @return true si hay conflicto (la sala ya está reservada en ese horario).
+     */
+    public boolean existeConflicto(Long idSala, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        return reservaRepository.existeConflicto(idSala, fechaInicio, fechaFin);
+    }
+
+    /**
+     * 🛠️ Versión para actualización: excluye la misma reserva del chequeo
+     */
+    public boolean existeConflictoExcluyendoActual(Long idReserva, Long idSala, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        return reservaRepository.existeConflictoExcluyendoActual(idReserva, idSala, fechaInicio, fechaFin);
+    }
+
 }

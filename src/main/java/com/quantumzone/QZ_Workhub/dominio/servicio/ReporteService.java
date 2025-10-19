@@ -65,8 +65,8 @@ public class ReporteService {
 
         return reporteDAO.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("reporte no encontrada con ID: {}", id);
-                    return new RuntimeException("reporte no encontrada con ID: " + id);
+                    log.warn("reporte no encontrado con ID: {}", id);
+                    return new RuntimeException("reporte no encontrado con ID: " + id);
                 });
     }
 

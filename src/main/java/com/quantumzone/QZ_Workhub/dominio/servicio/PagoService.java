@@ -70,8 +70,8 @@ public class PagoService {
 
         return pagoDAO.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("pago no encontrada con ID: {}", id);
-                    return new RuntimeException("pago no encontrada con ID: " + id);
+                    log.warn("pago no encontrado con ID: {}", id);
+                    return new RuntimeException("pago no encontrado con ID: " + id);
                 });
     }
 
@@ -164,6 +164,9 @@ public class PagoService {
 
         if (reservaService.findById(pagoDto.getIdReserva()) == null ) {
             throw new IllegalArgumentException("El id de la reserva no existe");
+        }
+        if (reservaService.findById(pagoDto.getIdReserva()).getIdReserva() == pagoDto.getIdReserva()) {
+            throw new IllegalArgumentException("Esta Pago ya fue realizado para esa reserva");
         }
     }
 }
