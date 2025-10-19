@@ -66,8 +66,8 @@ public class SalaService {
 
         return salaDAO.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("No se encontro la sala con ID: {}", id);
-                    return new RuntimeException("No se encontro la sala con ID: " + id);
+                    log.warn("No encontro la sala con ID: {}", id);
+                    return new RuntimeException("No encontro la sala con ID: " + id);
                 });
     }
 

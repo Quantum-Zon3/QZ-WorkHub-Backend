@@ -139,6 +139,7 @@ public class ReservaController {
                     responseCode = "500",
                     description = "Error interno del servidor"
             )
+
     })
     public ResponseEntity<ReservaDto> save(
             @Parameter(description = "Datos del reserva a crear", required = true)
@@ -151,6 +152,10 @@ public class ReservaController {
             log.info("Reserva creada exitosamente con ID: {}", reservaSave.getIdReserva());
             return ResponseEntity.status(HttpStatus.CREATED).body(reservaSave);
         } catch (IllegalArgumentException e) {
+            if(e.getMessage().contains("No encontro")){
+                log.warn("Error de validación al crear sala: {}", e.getMessage());
+                return ResponseEntity.badRequest().build();
+            }
             log.warn("Error de validación al crear reserva: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         }
@@ -220,6 +225,10 @@ public class ReservaController {
             @ApiResponse(
                     responseCode = "404",
                     description = "Reserva no encontrada"
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Reserva no asociada"
             )
     })
     public ResponseEntity<Void> delete(
@@ -233,6 +242,10 @@ public class ReservaController {
             log.info("Reserva eliminado exitosamente ID: {}", id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
+            if (e.getMessage().contains("asociados")) {
+                log.warn("Intento de eliminar sala con reservas ID: {}", id);
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
             log.warn("Reserva no encontrado para eliminar ID: {}", id);
             return ResponseEntity.notFound().build();
         }
