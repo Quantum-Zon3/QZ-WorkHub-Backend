@@ -61,7 +61,7 @@ public class ReporteService {
      */
     @Transactional(readOnly = true)
     public ReporteDto findById(Long id) {
-        log.debug("Buscando reporte por ID: {}", id);
+        log.info("Buscando reporte por ID: {}", id);
 
         return reporteDAO.findById(id)
                 .orElseThrow(() -> {
@@ -75,8 +75,9 @@ public class ReporteService {
      */
     @Transactional(readOnly = true)
     public List<ReporteDto> findAll() {
-        log.debug("Obteniendo todos los reporte: {}", reporteDAO.findAll().size());
-        return reporteDAO.findAll();
+        List<ReporteDto> reportes = reporteDAO.findAll();
+        log.info("Obteniendo todos los reporte: {}", reportes.size());
+        return reportes;
     }
 
     /**
