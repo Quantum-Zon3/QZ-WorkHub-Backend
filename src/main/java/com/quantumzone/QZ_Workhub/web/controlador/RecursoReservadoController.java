@@ -223,10 +223,6 @@ public class RecursoReservadoController {
             @ApiResponse(
                     responseCode = "404",
                     description = "recurso reservado no encontrado"
-            ),
-            @ApiResponse(
-                    responseCode = "409",
-                    description = "No se puede eliminar: usuario tiene reservas asociados"
             )
     })
     public ResponseEntity<Void> delete(
@@ -243,9 +239,6 @@ public class RecursoReservadoController {
             if (e.getMessage().contains("no encontrado")) {
                 log.warn("Recurso reservado no encontrado para eliminar ID: {}", id);
                 return ResponseEntity.notFound().build();
-            } else if (e.getMessage().contains("reserva")) {
-                log.warn("Intento de recurso reservado con reservas ID: {}", id);
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
             log.error("Error al eliminar recurso reservado ID {}: {}", id, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
