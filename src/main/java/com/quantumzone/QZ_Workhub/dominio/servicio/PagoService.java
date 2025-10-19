@@ -1,8 +1,8 @@
 package com.quantumzone.QZ_Workhub.dominio.servicio;
 import com.quantumzone.QZ_Workhub.dominio.dto.PagoDto;
+import com.quantumzone.QZ_Workhub.dominio.enums.EstadoPago;
 import com.quantumzone.QZ_Workhub.persistencia.dao.PagoDAO;
-import com.quantumzone.QZ_Workhub.persistencia.dao.ReservaDAO;
-import com.quantumzone.QZ_Workhub.persistencia.entidad.Pago;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -54,6 +55,14 @@ public class PagoService {
      */
     public PagoDto save(PagoDto pagoDto) {
         log.info("Creando nuevo pago con cedula: {}", pagoDto.getIdPago());
+        for (int i = 0; i < findAll().size() ; i++) {
+            PagoDto pago = (PagoDto) findAll().get(i);
+            if (Objects.equals(pagoDto.getIdReserva(), pago.getIdReserva())
+                    && pago.getEstadoPago() == EstadoPago.COMPLETADO) {
+                throw new IllegalArgumentException("La reserva con ID " + pago.getIdReserva() + " ya está pagada.");
+            }
+
+        }
         // Validaciones adicionales de negocio
         validarPago(pagoDto);
         // Crear pago
@@ -167,8 +176,6 @@ public class PagoService {
         if (reservaService.findById(pagoDto.getIdReserva()) == null ) {
             throw new IllegalArgumentException("El id de la reserva no existe");
         }
-        if (reservaService.findById(pagoDto.getIdReserva()).getIdReserva() == pagoDto.getIdReserva()) {
-            throw new IllegalArgumentException("Esta Pago ya fue realizado para esa reserva");
-        }
+
     }
 }

@@ -359,7 +359,7 @@ public class ReservaService {
 
         // ===== VALIDAR CONFLICTO CON OTRAS RESERVAS =====
         boolean hayConflicto = reservaDAO.existeConflictoExcluyendoActual(
-                reservaDto.getIdReserva(), // 👈 excluye la reserva que se está actualizando
+                reservaDto.getIdReserva(),
                 reservaDto.getIdSala(),
                 reservaDto.getFechaInicio(),
                 reservaDto.getFechaFin()
