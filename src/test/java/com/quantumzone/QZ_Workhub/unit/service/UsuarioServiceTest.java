@@ -28,6 +28,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -71,6 +73,123 @@ public class UsuarioServiceTest {
         usuarioDtoValido.setFechaRegistro(LocalDateTime.now(clock));
         usuarioDtoValido.setTelefono("123456789");
     }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si la cédula es nula o <= 0")
+    void validarUsuario_CedulaInvalida() {
+        usuarioDtoValido.setCedula(0L);
+
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.save(usuarioDtoValido));
+
+        assertEquals("La cédula es obligatoria y debe ser un número positivo", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el nombre es vacío")
+    void validarUsuario_NombreVacio() {
+        usuarioDtoValido.setNombre(" ");
+
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.save(usuarioDtoValido));
+
+        assertEquals("El nombre del usuario es obligatorio", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el nombre excede 45 caracteres")
+    void validarUsuario_NombreLargo() {
+        usuarioDtoValido.setNombre("A".repeat(46));
+
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.save(usuarioDtoValido));
+
+        assertEquals("El nombre no puede exceder 45 caracteres", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el apellido es vacío o largo")
+    void validarUsuario_ApellidoInvalido() {
+        usuarioDtoValido.setApellido(" ");
+
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.save(usuarioDtoValido));
+
+        assertEquals("El apellido del usuario es obligatorio", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el email es inválido")
+    void validarUsuario_EmailInvalido() {
+        usuarioDtoValido.setEmail("correo@");
+
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.save(usuarioDtoValido));
+
+        assertEquals("El formato del email no es válido", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el rol es nulo")
+    void validarUsuario_RolNulo() {
+        usuarioDtoValido.setRol(null);
+
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.save(usuarioDtoValido));
+
+        assertEquals("El rol del usuario es obligatorio", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si la contraseña no cumple requisitos")
+    void validarUsuario_ContrasenaInvalida() {
+        usuarioDtoValido.setContraseña("abc"); // corta y sin números
+
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.save(usuarioDtoValido));
+
+        assertEquals("La contraseña debe tener entre 8 y 45 caracteres", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si el teléfono tiene caracteres inválidos")
+    void validarUsuario_TelefonoInvalido() {
+        usuarioDtoValido.setCedula(1L);
+        usuarioDtoValido.setNombre("Juan");
+        usuarioDtoValido.setApellido("Pérez");
+        usuarioDtoValido.setEmail("juan@example.com");
+        usuarioDtoValido.setRol(Rol.MIEMBRO);
+        usuarioDtoValido.setContraseña("abc12345");
+        usuarioDtoValido.setTelefono("abc123");
+        usuarioDtoValido.setFechaRegistro(LocalDateTime.now(clock));
+
+
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.save(usuarioDtoValido));
+
+        assertEquals("El teléfono solo puede contener números, espacios, '+' o '-'", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si la cédula ya está registrada")
+    void validarUsuario_CedulaDuplicada() {
+        usuarioDtoValido.setCedula(1L);
+        usuarioDtoValido.setNombre("Juan");
+        usuarioDtoValido.setApellido("Pérez");
+        usuarioDtoValido.setEmail("juan@example.com");
+        usuarioDtoValido.setRol(Rol.MIEMBRO);
+        usuarioDtoValido.setContraseña("abc12345");
+        usuarioDtoValido.setTelefono("123456789");
+        usuarioDtoValido.setFechaRegistro(LocalDateTime.now(clock));
+
+        when(usuarioDAO.findAll()).thenReturn(List.of(usuarioDtoValido));
+
+        Exception exception = assertThrows(IllegalArgumentException.class,
+                () -> usuarioService.save(usuarioDtoValido));
+
+        assertEquals("El cedula es ya esta registrado", exception.getMessage());
+    }
+
 
     @Test
     @DisplayName("CREATE - Usuario válido debe retornar usuario creado con ID")

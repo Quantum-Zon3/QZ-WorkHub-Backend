@@ -116,7 +116,7 @@ public class RecursoReservadoService {
     }
 
 
-    private void validarRecursoR(RecursoReservadoDto recursoRDto) {
+    public void validarRecursoR(RecursoReservadoDto recursoRDto) {
         LocalDateTime now = LocalDateTime.now(clock);
         // Validar id de recurso
         if (recursoRDto.getIdRecurso() == null || recursoRDto.getIdRecurso() == 0) {
