@@ -5,6 +5,7 @@ target/
 *.class
 *.log
 /bin/
+ajcore.*
 *~
 .DS_Store
 *.swp

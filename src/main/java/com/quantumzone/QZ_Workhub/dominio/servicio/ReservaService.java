@@ -162,7 +162,7 @@ public class ReservaService {
         findById(id);
 
         //validaciones de negocio
-        validarReserva(reservaDto);
+        validarReservaParaUpdate(reservaDto);
 
         // Actualizar
         ReservaDto reservaActualizada = reservaDAO.update(id, reservaDto)
