@@ -1,10 +1,5 @@
 package com.quantumzone.QZ_Workhub.dominio.dto;
-
-import com.quantumzone.QZ_Workhub.dominio.enums.Rol;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,10 +22,6 @@ public class UsuarioDto {
 
     @Schema(description = "Email del usuario", example = "juan@gmail.com", required = true, maxLength = 45)
     private String email;
-
-    @Enumerated(EnumType.STRING)
-    @Schema(description = "Rol del usuario", example = "MIEMBRO", required = true)
-    private Rol rol;
 
     @Schema(description = "Contraseña del usuario", example = "mimamamemima", required = true, maxLength = 45)
     private String contraseña;
