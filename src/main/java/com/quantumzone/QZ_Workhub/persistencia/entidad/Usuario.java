@@ -1,5 +1,4 @@
 package com.quantumzone.QZ_Workhub.persistencia.entidad;
-import com.quantumzone.QZ_Workhub.dominio.enums.Rol;
 // imports de la persitencia
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -25,10 +24,6 @@ public class Usuario {
     @Column(name = "email", length = 45, nullable = false, unique = true)
     private String email;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "rol", nullable = false)
-    private Rol rol;
-
     @Column(name = "contraseña", length = 45, nullable = false)
     private String contraseña;
 
@@ -44,5 +39,8 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario")
     private List<Reporte> reportes;
+
+    @OneToMany(mappedBy = "usuario")
+    private List<RolAsignado> rolesAsignados;
     
 }
