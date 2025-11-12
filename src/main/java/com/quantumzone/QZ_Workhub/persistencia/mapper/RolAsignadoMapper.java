@@ -51,7 +51,6 @@ public interface RolAsignadoMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "rol", source = "idRol", qualifiedByName = "createRolFromId")
     @Mapping(target = "usuario", source = "cedula", qualifiedByName = "createUsuarioFromCedula")
-    @Mapping(target = "id", source = "id")
     @Mapping(target = "fechaAsignada", source = "fechaAsignada")
     RolAsignado toRolAsignado(RolAsignadoDto rolAsignadoDto);
 
