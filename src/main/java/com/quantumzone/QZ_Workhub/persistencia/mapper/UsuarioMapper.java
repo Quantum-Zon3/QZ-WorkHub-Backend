@@ -30,7 +30,6 @@ public interface UsuarioMapper {
     @Mapping(target = "nombre", source = "nombre" )
     @Mapping(target = "apellido", source = "apellido")
     @Mapping(target = "email", source = "email")
-    @Mapping(target = "rol", source = "rol")
     @Mapping(target = "contraseña", source = "contraseña")
     @Mapping(target = "fechaRegistro", source = "fechaRegistro")
     @Mapping(target = "telefono", source = "telefono")
@@ -43,7 +42,6 @@ public interface UsuarioMapper {
     @Mapping(target = "nombre", source = "nombre" )
     @Mapping(target = "apellido", source = "apellido")
     @Mapping(target = "email", source = "email")
-    @Mapping(target = "rol", source = "rol")
     @Mapping(target = "contraseña", source = "contraseña")
     @Mapping(target = "fechaRegistro", source = "fechaRegistro")
     @Mapping(target = "telefono", source = "telefono")
@@ -59,17 +57,16 @@ public interface UsuarioMapper {
      * MAPEO AUTOMÁTICO:
      * - name, email, phone, address se mapean automáticamente
      */
-
     @Mapping(target  = "cedula", source = "cedula")
     @Mapping(target = "nombre", source = "nombre" )
     @Mapping(target = "apellido", source = "apellido")
     @Mapping(target = "email", source = "email")
-    @Mapping(target = "rol", source = "rol")
     @Mapping(target = "contraseña", source = "contraseña")
     @Mapping(target = "fechaRegistro", source = "fechaRegistro")
     @Mapping(target = "telefono", source = "telefono")
     @Mapping(target = "reservas", ignore = true)
     @Mapping(target = "reportes", ignore = true)
+    @Mapping(target = "rolesAsignados", ignore = true)
     Usuario toUsuario(UsuarioDto usuarioDto);
 
     /**
@@ -87,9 +84,9 @@ public interface UsuarioMapper {
     @Mapping(target = "email", ignore = true)  // No puede edtiar su email
     @Mapping(target = "reservas", ignore = true)
     @Mapping(target = "reportes", ignore = true)
+    @Mapping(target = "rolesAsignados", ignore = true)
     @Mapping(target = "nombre", source = "nombre")
     @Mapping(target = "apellido", source = "apellido")
-    @Mapping(target = "rol", source = "rol")
     @Mapping(target = "contraseña", source = "contraseña")
     @Mapping(target = "telefono", source = "telefono")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
