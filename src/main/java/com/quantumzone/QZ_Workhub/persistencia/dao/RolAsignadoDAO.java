@@ -2,6 +2,7 @@ package com.quantumzone.QZ_Workhub.persistencia.dao;
 
 import com.quantumzone.QZ_Workhub.dominio.dto.RolAsignadoDto;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.RolAsignado;
+import com.quantumzone.QZ_Workhub.persistencia.mapper.RolAsignadoMapper;
 import com.quantumzone.QZ_Workhub.persistencia.repositorio.RolAsignadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;

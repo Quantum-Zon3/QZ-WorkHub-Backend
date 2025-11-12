@@ -2,6 +2,7 @@ package com.quantumzone.QZ_Workhub.persistencia.dao;
 
 import com.quantumzone.QZ_Workhub.dominio.dto.RolDto;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Rol;
+import com.quantumzone.QZ_Workhub.persistencia.mapper.RolMapper;
 import com.quantumzone.QZ_Workhub.persistencia.repositorio.RolRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
