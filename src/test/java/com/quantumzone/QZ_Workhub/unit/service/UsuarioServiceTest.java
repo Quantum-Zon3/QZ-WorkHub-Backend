@@ -68,7 +68,6 @@ public class UsuarioServiceTest {
         usuarioDtoValido.setNombre("Nombre");
         usuarioDtoValido.setApellido("Apellido");
         usuarioDtoValido.setEmail("example@example.com");
-        usuarioDtoValido.setRol(Rol.MIEMBRO);
         usuarioDtoValido.setContraseña("12345");
         usuarioDtoValido.setFechaRegistro(LocalDateTime.now(clock));
         usuarioDtoValido.setTelefono("123456789");
@@ -130,17 +129,6 @@ public class UsuarioServiceTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar excepción si el rol es nulo")
-    void validarUsuario_RolNulo() {
-        usuarioDtoValido.setRol(null);
-
-        Exception exception = assertThrows(IllegalArgumentException.class,
-                () -> usuarioService.save(usuarioDtoValido));
-
-        assertEquals("El rol del usuario es obligatorio", exception.getMessage());
-    }
-
-    @Test
     @DisplayName("Debe lanzar excepción si la contraseña no cumple requisitos")
     void validarUsuario_ContrasenaInvalida() {
         usuarioDtoValido.setContraseña("abc"); // corta y sin números
@@ -158,7 +146,6 @@ public class UsuarioServiceTest {
         usuarioDtoValido.setNombre("Juan");
         usuarioDtoValido.setApellido("Pérez");
         usuarioDtoValido.setEmail("juan@example.com");
-        usuarioDtoValido.setRol(Rol.MIEMBRO);
         usuarioDtoValido.setContraseña("abc12345");
         usuarioDtoValido.setTelefono("abc123");
         usuarioDtoValido.setFechaRegistro(LocalDateTime.now(clock));
@@ -177,7 +164,6 @@ public class UsuarioServiceTest {
         usuarioDtoValido.setNombre("Juan");
         usuarioDtoValido.setApellido("Pérez");
         usuarioDtoValido.setEmail("juan@example.com");
-        usuarioDtoValido.setRol(Rol.MIEMBRO);
         usuarioDtoValido.setContraseña("abc12345");
         usuarioDtoValido.setTelefono("123456789");
         usuarioDtoValido.setFechaRegistro(LocalDateTime.now(clock));
@@ -200,7 +186,6 @@ public class UsuarioServiceTest {
         toCreate.setNombre("Nombre");
         toCreate.setApellido("Apellido");
         toCreate.setEmail("example@example.com");
-        toCreate.setRol(Rol.MIEMBRO);
         toCreate.setContraseña("123456789A");
         toCreate.setFechaRegistro(LocalDateTime.now(clock));
         toCreate.setTelefono("123456789");
@@ -210,7 +195,6 @@ public class UsuarioServiceTest {
         persisted.setNombre("Nombre");
         persisted.setApellido("Apellido");
         persisted.setEmail("example@example.com");
-        persisted.setRol(Rol.MIEMBRO);
         persisted.setFechaRegistro(LocalDateTime.now(clock));
         persisted.setTelefono("123456789");
 
@@ -241,7 +225,6 @@ public class UsuarioServiceTest {
         existente.setNombre("Usuario Existente");
         existente.setApellido("Prueba");
         existente.setEmail("example@example.com");
-        existente.setRol(Rol.MIEMBRO);
         existente.setContraseña("123456789A");
         existente.setTelefono("987654321");
         existente.setFechaRegistro(LocalDateTime.now(clock));
@@ -253,7 +236,6 @@ public class UsuarioServiceTest {
         nuevo.setNombre("Nuevo");
         nuevo.setApellido("Usuario");
         nuevo.setEmail("example@example.com"); // duplicado
-        nuevo.setRol(Rol.MIEMBRO);
         nuevo.setContraseña("123456789A");
         nuevo.setTelefono("123456789");
         nuevo.setFechaRegistro(LocalDateTime.now(clock));
@@ -390,7 +372,6 @@ public class UsuarioServiceTest {
         existing.setNombre("Antonio");
         existing.setApellido("Buenafuente");
         existing.setEmail("antonio@gmail.com");
-        existing.setRol(Rol.VISITANTE);
         existing.setContraseña("12345678A");
         existing.setFechaRegistro(LocalDateTime.now(clock));
         existing.setTelefono("123456789");
@@ -399,7 +380,6 @@ public class UsuarioServiceTest {
         update.setNombre("Antonio Nuevo");
         update.setApellido("Buenafuente Nuevo");
         update.setEmail("antonioBuena@gmail.com");
-        update.setRol(existing.getRol());
         update.setContraseña(existing.getContraseña());
         update.setFechaRegistro(existing.getFechaRegistro());
         update.setTelefono(existing.getTelefono());
@@ -409,7 +389,6 @@ public class UsuarioServiceTest {
         updated.setNombre("Antonio Nuevo");
         updated.setApellido("Buenafuente Nuevo");
         updated.setEmail("antonioBuena@gmail.com");
-        updated.setRol(existing.getRol());
         updated.setContraseña(existing.getContraseña());
         updated.setFechaRegistro(existing.getFechaRegistro());
         updated.setTelefono(existing.getTelefono());
