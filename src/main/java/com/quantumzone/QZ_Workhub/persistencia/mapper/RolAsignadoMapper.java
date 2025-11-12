@@ -36,7 +36,7 @@ public interface RolAsignadoMapper {
      * Convierte lista de RolAsignado a lista de RolAsignadoDto
      */
     @Mapping(target = "idRol", source = "rol",qualifiedByName = "createIdFromRol")
-    @Mapping(target = "idUsuario", source = "usuario",qualifiedByName = "createCedulaFromUsuario")
+    @Mapping(target = "cedula", source = "usuario",qualifiedByName = "createCedulaFromUsuario")
     @Mapping(target = "id", source = "id")
     @Mapping(target = "fechaAsignada", source = "fechaAsignada")
     List<RolAsignadoDto> toRolAsignadoDtos(List<RolAsignado> rolAsignados);
@@ -51,7 +51,6 @@ public interface RolAsignadoMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "rol", source = "idRol", qualifiedByName = "createRolFromId")
     @Mapping(target = "usuario", source = "cedula", qualifiedByName = "createUsuarioFromCedula")
-    @Mapping(target = "id", source = "id")
     @Mapping(target = "fechaAsignada", source = "fechaAsignada")
     RolAsignado toRolAsignado(RolAsignadoDto rolAsignadoDto);
 
@@ -62,8 +61,8 @@ public interface RolAsignadoMapper {
      * - Si un campo en RecursoReservadoDTO es null, no se sobrescribe
      */
     @Mapping(target = "id", ignore = true)        // No editable
-    @Mapping(target = "Rol", ignore = true)   // Relación manejada en el servicio
-    @Mapping(target = "Usuario", ignore = true)   // Relación manejada en el servicio
+    @Mapping(target = "rol", ignore = true)   // Relación manejada en el servicio
+    @Mapping(target = "usuario", ignore = true)   // Relación manejada en el servicio
     @Mapping(target = "fechaAsignada", source = "fechaAsignada")
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
