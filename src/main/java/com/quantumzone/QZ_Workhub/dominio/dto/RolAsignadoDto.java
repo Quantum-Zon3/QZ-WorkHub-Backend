@@ -27,7 +27,7 @@ public class RolAsignadoDto {
     @Schema(description = "id del Rol que se asignò", example = "2", required = true)
     private Long idRol;
 
-    @Schema(description = "id del Usuario al que se le asignarà el rol", example = "1", required = true)
-    private Long idUsuario;
+    @Schema(description = "Cedula del Usuario al que se le asignarà el rol", example = "1", required = true)
+    private Long cedula;
 
 }

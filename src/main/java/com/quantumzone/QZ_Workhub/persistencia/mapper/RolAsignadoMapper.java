@@ -36,7 +36,7 @@ public interface RolAsignadoMapper {
      * Convierte lista de RolAsignado a lista de RolAsignadoDto
      */
     @Mapping(target = "idRol", source = "rol",qualifiedByName = "createIdFromRol")
-    @Mapping(target = "idUsuario", source = "usuario",qualifiedByName = "createCedulaFromUsuario")
+    @Mapping(target = "cedula", source = "usuario",qualifiedByName = "createCedulaFromUsuario")
     @Mapping(target = "id", source = "id")
     @Mapping(target = "fechaAsignada", source = "fechaAsignada")
     List<RolAsignadoDto> toRolAsignadoDtos(List<RolAsignado> rolAsignados);
