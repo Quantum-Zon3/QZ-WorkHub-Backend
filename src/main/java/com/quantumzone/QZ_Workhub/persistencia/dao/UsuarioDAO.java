@@ -1,7 +1,6 @@
 package com.quantumzone.QZ_Workhub.persistencia.dao;
 
 import com.quantumzone.QZ_Workhub.dominio.dto.UsuarioDto;
-import com.quantumzone.QZ_Workhub.dominio.enums.Rol;
 import com.quantumzone.QZ_Workhub.persistencia.entidad.Usuario;
 import com.quantumzone.QZ_Workhub.persistencia.mapper.UsuarioMapper;
 import com.quantumzone.QZ_Workhub.persistencia.repositorio.UsuarioRepository;

@@ -2,7 +2,6 @@ package com.quantumzone.QZ_Workhub.dominio.servicio;
 import com.quantumzone.QZ_Workhub.dominio.dto.ReporteDto;
 import com.quantumzone.QZ_Workhub.dominio.dto.ReservaDto;
 import com.quantumzone.QZ_Workhub.dominio.dto.UsuarioDto;
-import com.quantumzone.QZ_Workhub.dominio.enums.Rol;
 import com.quantumzone.QZ_Workhub.persistencia.dao.UsuarioDAO;
 
 import lombok.extern.slf4j.Slf4j;
