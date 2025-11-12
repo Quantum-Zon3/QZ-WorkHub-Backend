@@ -61,8 +61,8 @@ public interface RolAsignadoMapper {
      * - Si un campo en RecursoReservadoDTO es null, no se sobrescribe
      */
     @Mapping(target = "id", ignore = true)        // No editable
-    @Mapping(target = "Rol", ignore = true)   // Relación manejada en el servicio
-    @Mapping(target = "Usuario", ignore = true)   // Relación manejada en el servicio
+    @Mapping(target = "rol", ignore = true)   // Relación manejada en el servicio
+    @Mapping(target = "usuario", ignore = true)   // Relación manejada en el servicio
     @Mapping(target = "fechaAsignada", source = "fechaAsignada")
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
