@@ -27,7 +27,7 @@ public interface RolAsignadoMapper {
      * CAMPOS IGNORADOS:
      */
     @Mapping(target = "idRol", source = "rol",qualifiedByName = "createIdFromRol")
-    @Mapping(target = "idUsuario", source = "usuario",qualifiedByName = "createCedulaFromUsuario")
+    @Mapping(target = "cedula", source = "usuario",qualifiedByName = "createCedulaFromUsuario")
     @Mapping(target = "id", source = "id")
     @Mapping(target = "fechaAsignada", source = "fechaAsignada")
     RolAsignadoDto toRolAsignadoDto(RolAsignado rolAsignado);
