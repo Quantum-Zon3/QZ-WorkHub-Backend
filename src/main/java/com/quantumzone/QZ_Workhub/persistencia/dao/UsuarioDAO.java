@@ -32,10 +32,6 @@ public class UsuarioDAO {
         return usuarioMapper.toUsuarioDtos(usuarios);
     }
 
-    public Optional<List<UsuarioDto>> findByRol(Rol rol) {
-        return usuarioRepository.findUsuarioByRol(rol).map(usuarioMapper::toUsuarioDtos);
-    }
-
     public Optional<UsuarioDto> update(Long id, UsuarioDto usuarioDto) {
         return usuarioRepository.findById(id).map(usuario -> {
             usuarioMapper.updateUsuario(usuarioDto, usuario);
