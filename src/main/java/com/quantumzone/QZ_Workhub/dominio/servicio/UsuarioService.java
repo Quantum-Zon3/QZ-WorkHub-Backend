@@ -191,10 +191,6 @@ public class UsuarioService {
             throw new IllegalArgumentException("El formato del email no es válido");
         }
 
-        // Validar rol
-        if (usuarioDto.getRol() == null) {
-            throw new IllegalArgumentException("El rol del usuario es obligatorio");
-        }
 
         // Validar contraseña
         if (usuarioDto.getContraseña() == null || usuarioDto.getContraseña().trim().isEmpty()) {
@@ -261,11 +257,6 @@ public class UsuarioService {
         }
         if (usuarioDto.getEmail().length() > 45) {
             throw new IllegalArgumentException("El email no puede exceder 45 caracteres");
-        }
-
-        // Validar rol
-        if (usuarioDto.getRol() == null) {
-            throw new IllegalArgumentException("El rol del usuario es obligatorio");
         }
 
         // Validar contraseña
