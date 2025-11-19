@@ -1,58 +1,64 @@
 # ============================================
-# ETAPA 1: Construcción (Build Stage)
+# ETAPA 1: Construcción
 # ============================================
-# Usamos una imagen con Gradle y JDK 21
-FROM gradle:8.5-jdk21 AS build
+# Imagen base estable con JDK 21
+FROM eclipse-temurin:21-jdk AS build
 
-# Establecer directorio de trabajo
 WORKDIR /app
 
-# Copiar archivos de configuración de Gradle
+# Copiar archivos de Gradle
 COPY build.gradle settings.gradle ./
-
-# Copiar el wrapper de Gradle
-COPY gradlew ./
 COPY gradle ./gradle
+COPY gradlew ./
 
-# Dar permisos de ejecución al gradlew
+# Permisos
 RUN chmod +x gradlew
 
-# Descargar dependencias (se cachea si no cambian los archivos .gradle)
-RUN gradle dependencies --no-daemon || return 0
+# Actualizar certificados SSL (CRÍTICO)
+RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
 
-# Copiar el código fuente
-COPY src ./src
-
-# Compilar la aplicación y crear el JAR
-# -x test: omite los tests para build más rápido
-# --no-daemon: no deja procesos en segundo plano
-RUN gradle clean build -x test --no-daemon
+# Forzar TLS moderno
+ENV JAVA_TOOL_OPTIONS="-Djdk.tls.client.protocols=TLSv1.2,TLSv1.3"
 
 # ============================================
-# ETAPA 2: Ejecución (Runtime Stage)
+# ETAPA 1: Construcción
 # ============================================
-# Usamos solo el JRE (Java Runtime Environment) - más ligero
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jdk AS build
 
-# Crear un usuario no-root por seguridad
-RUN addgroup -S spring && adduser -S spring -G spring
-
-# Cambiar al usuario spring
-USER spring:spring
-
-# Directorio de trabajo
 WORKDIR /app
 
-# Copiar el JAR desde la etapa de build
-# El * permite copiar sin saber el nombre exacto del JAR
-COPY --from=build /app/build/libs/*.jar app.jar
+# Copiar gradle wrapper y archivos
+COPY gradlew .
+COPY gradle ./gradle
+COPY build.gradle settings.gradle ./
 
-# Exponer el puerto 8080 (puerto por defecto de Spring Boot)
-EXPOSE 8080
+# Dar permisos al wrapper
+RUN chmod +x gradlew
 
-# Variables de entorno por defecto
-ENV JAVA_OPTS="-Xms256m -Xmx512m"
+# Actualizar certificados SSL
+RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
 
-# Comando para ejecutar la aplicación
-# ${JAVA_OPTS} permite configurar memoria desde docker-compose
-ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar"]
+# Forzar protocolo TLS moderno
+ENV JAVA_TOOL_OPTIONS="-Djdk.tls.client.protocols=TLSv1.2,TLSv1.3"
+
+# Descargar dependencias
+RUN ./gradlew dependencies --no-daemon || true
+
+# Copiar código fuente
+COPY src ./src
+
+# Build sin tests
+RUN ./gradlew clean build -x test --no-daemon
+
+
+# ============================================
+# ETAPA 2: Runtime
+# ============================================
+FROM eclipse-temurin:21-jre-alpine
+
+RUN addgroup -S spring && adduser -S spring -G spring
+USER spring:spring
+
+WORKDIR /app
+
+COPY --from=build /app/build/libs/*.jar app*
