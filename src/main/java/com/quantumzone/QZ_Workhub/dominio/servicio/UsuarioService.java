@@ -84,6 +84,29 @@ public class UsuarioService {
                 });
     }
 
+    @Transactional(readOnly = true)
+    public UsuarioDto loguear(String email, String password) {
+        log.info("Buscando usuario por email: {}", email);
+        List<UsuarioDto> users = findAll();
+        if (users.isEmpty()) {
+            throw new IllegalStateException("La lista de usuarios está vacía");
+        }
+        for (UsuarioDto usuario : users) {
+            // Validamos email
+            if (usuario.getEmail().equals(email)) {
+
+                // Validamos contraseña
+                if (!usuario.getContraseña().equals(password)) {
+                    throw new IllegalStateException("Contraseña incorrecta");
+                }
+                return usuario; // Login correcto
+            }
+        }
+        throw new IllegalStateException(
+                String.format("No existe un usuario con el email: %s", email)
+        );
+    }
+
     /**
      * Obtener todos los Usuarios
      */

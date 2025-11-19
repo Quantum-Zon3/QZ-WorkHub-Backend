@@ -1,5 +1,7 @@
 package com.quantumzone.QZ_Workhub.web.controlador;
 import java.util.List;
+
+import com.quantumzone.QZ_Workhub.dominio.dto.LoginRequest;
 import com.quantumzone.QZ_Workhub.dominio.dto.UsuarioDto;
 import com.quantumzone.QZ_Workhub.dominio.servicio.UsuarioService;
 //imports de anotacion springboot
@@ -252,19 +254,11 @@ public class UsuarioController {
         }
     }
 
-    /*
-    @GetMapping("/rol")
-    @Operation(summary = "Buscar usuarios por rol", description = "Devuelve los usuarios asociados a un rol específico.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Usuarios encontrados"),
-            @ApiResponse(responseCode = "404", description = "No se encontraron usuarios con ese rol")
-    })
-    public ResponseEntity<List<UsuarioDto>> findByRol(
-            @RequestParam @Parameter(description = "Rol del usuario") Rol rol) {
+    @PostMapping("/login")
+    public ResponseEntity<UsuarioDto> login(@RequestBody LoginRequest request) {
 
-        return usuarioService.findUsuarioByRol(rol)
-                .map(usuarios -> new ResponseEntity<>(usuarios, HttpStatus.OK))
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        UsuarioDto usuario = usuarioService.loguear(request.getEmail(), request.getPassword());
+
+        return ResponseEntity.ok(usuario);
     }
-     */
 }
